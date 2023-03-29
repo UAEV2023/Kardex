@@ -8,6 +8,7 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
+import Task
 
 
 
@@ -17,6 +18,7 @@ import Json.Decode as Decode
 type alias Model =
     { hover : Bool
     , files : List File
+    , content : String
     }
 
 
@@ -24,6 +26,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { hover = False
       , files = []
+      , content = ""
       }
     , Cmd.none
     )
@@ -38,6 +41,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
+    | GotContent String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,6 +67,11 @@ update msg model =
                 | files = file :: files
                 , hover = False
               }
+            , Task.perform GotContent (File.toString file)
+            )
+
+        GotContent content ->
+            ( { model | content = content }
             , Cmd.none
             )
 
