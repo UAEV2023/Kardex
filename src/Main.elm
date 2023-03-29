@@ -1,11 +1,13 @@
 module Main exposing (..)
 
 import Browser
+import Css exposing (..)
 import File exposing (File)
 import File.Select as Select
 import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
+import Json.Decode as Decode
 
 
 
@@ -43,7 +45,7 @@ update msg model =
     case msg of
         Pick ->
             ( model
-            , Select.files [ "image/*" ] GotFiles
+            , Select.files [ "*" ] GotFiles
             )
 
         DragEnter ->
@@ -69,11 +71,43 @@ update msg model =
 ---- VIEW ----
 
 
+alwaysPreventDefault :
+    msg
+    ->
+        { message : msg
+        , stopPropagation : Bool
+        , preventDefault : Bool
+        }
+alwaysPreventDefault msg =
+    { message = msg
+    , stopPropagation = True
+    , preventDefault = True
+    }
+
+
+hijackOn : String -> Decode.Decoder msg -> Attribute msg
+hijackOn event decoder =
+    custom event (Decode.map alwaysPreventDefault decoder)
+
+
 view : Model -> Html Msg
 view model =
-    div []
-        [ img [ Attributes.src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+    styled div
+        [ border3 (px 2) dashed (rgb 11 14 17)
+        , borderRadius (rem 1)
+        , width (pct 80)
+        , height (rem 8)
+        ]
+        [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
+        , hijackOn "dragover" (Decode.succeed DragEnter)
+        , on "dragenter" (Decode.succeed DragEnter)
+        , on "dragleave" (Decode.succeed DragLeave)
+        ]
+        [ button [ onClick Pick ] [ text "Upload Images" ]
+        , styled span
+            [ color (rgb 11 14 17) ]
+            []
+            [ text (Debug.toString model) ]
         ]
 
 
