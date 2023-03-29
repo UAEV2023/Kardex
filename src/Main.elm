@@ -4,6 +4,7 @@ import Browser
 import Css exposing (..)
 import File exposing (File)
 import File.Select as Select
+import Html.Parser
 import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
@@ -116,7 +117,7 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ text (Debug.toString model) ]
+            [ text (Debug.toString (Html.Parser.runDocument model.content)) ]
         ]
 
 
