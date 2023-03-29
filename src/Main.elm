@@ -117,8 +117,54 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ text (Debug.toString (Html.Parser.runDocument model.content)) ]
+            [ text (Debug.toString (semesterNodes (Html.Parser.runDocument model.content))) ]
         ]
+
+
+semesterNodes : Result (List a) Html.Parser.Document -> List Html.Parser.Node
+semesterNodes docResult =
+    case docResult of
+        Ok { document } ->
+            document
+                |> Tuple.second
+                |> findByClassInNodeList "textoTablasKardex"
+
+        Err _ ->
+            []
+
+
+findByClassInNodeList : String -> List Html.Parser.Node -> List Html.Parser.Node
+findByClassInNodeList class nodes =
+    case nodes of
+        [] ->
+            []
+
+        node :: nextNodes ->
+            findByClassInNode class node ++ findByClassInNodeList class nextNodes
+
+
+findByClassInNode : String -> Html.Parser.Node -> List Html.Parser.Node
+findByClassInNode class node =
+    case node of
+        Html.Parser.Element _ attributes nodes ->
+            if attributes |> List.any (hasClass class) then
+                [ node ]
+
+            else
+                findByClassInNodeList class nodes
+
+        _ ->
+            []
+
+
+hasClass : String -> ( String, String ) -> Bool
+hasClass className attribute =
+    case attribute of
+        ( "class", classNames ) ->
+            classNames |> String.contains className
+
+        _ ->
+            False
 
 
 
