@@ -9,6 +9,7 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
+import Maybe.Extra
 import Task
 
 
@@ -117,20 +118,54 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ text (Debug.toString (semesterNodes (Html.Parser.runDocument model.content))) ]
+            [ text (Debug.toString (semesters (Html.Parser.runDocument model.content))) ]
         ]
 
 
-semesterNodes : Result (List a) Html.Parser.Document -> List Html.Parser.Node
-semesterNodes docResult =
+semesters : Result (List a) Html.Parser.Document -> List Semester
+semesters docResult =
     case docResult of
         Ok { document } ->
             document
                 |> Tuple.second
                 |> findByClassInNodeList "textoTablasKardex"
+                |> List.map nodeToSemester
 
         Err _ ->
             []
+
+
+type alias Semester =
+    { title : Maybe String
+    , subjects : List String
+    }
+
+
+nodeToSemester : Html.Parser.Node -> Semester
+nodeToSemester node =
+    case node of
+        Html.Parser.Element _ _ ((Html.Parser.Element _ _ (titleNode :: nodesAfterTitle)) :: _) ->
+            { title = firstText titleNode
+            , subjects = []
+            }
+
+        _ ->
+            Semester Nothing []
+
+
+firstText : Html.Parser.Node -> Maybe String
+firstText node =
+    case node of
+        Html.Parser.Text string ->
+            Just string
+
+        Html.Parser.Element _ _ nodes ->
+            nodes
+                |> List.map firstText
+                |> Maybe.Extra.orList
+
+        _ ->
+            Nothing
 
 
 findByClassInNodeList : String -> List Html.Parser.Node -> List Html.Parser.Node
