@@ -118,24 +118,24 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ text (Debug.toString (semesters (Html.Parser.runDocument model.content))) ]
+            [ text (Debug.toString (leerKardex (Html.Parser.runDocument model.content))) ]
         ]
 
 
-semesters : Result (List a) Html.Parser.Document -> List Semester
-semesters docResult =
+leerKardex : Result (List a) Html.Parser.Document -> List PeriodoCursado
+leerKardex docResult =
     case docResult of
         Ok { document } ->
             document
                 |> Tuple.second
                 |> findByClassInNodeList "textoTablasKardex"
-                |> List.map nodeToSemester
+                |> List.map leerPeriodo
 
         Err _ ->
             []
 
 
-type alias Subject =
+type alias MateriaCursada =
     { asignatura : Maybe String
     , calificacion : Maybe String
     , situacion : Maybe String
@@ -144,30 +144,30 @@ type alias Subject =
     }
 
 
-emptySubject : Subject
+emptySubject : MateriaCursada
 emptySubject =
-    Subject Nothing Nothing Nothing Nothing Nothing
+    MateriaCursada Nothing Nothing Nothing Nothing Nothing
 
 
-type alias Semester =
-    { title : Maybe String
-    , subjects : List Subject
+type alias PeriodoCursado =
+    { cicloEscolar : Maybe String
+    , materias : List MateriaCursada
     }
 
 
-nodeToSemester : Html.Parser.Node -> Semester
-nodeToSemester node =
+leerPeriodo : Html.Parser.Node -> PeriodoCursado
+leerPeriodo node =
     case node of
         Html.Parser.Element _ _ ((Html.Parser.Element _ _ (titleNode :: nodesAfterTitle)) :: _) ->
-            { title = firstText titleNode
-            , subjects = nodesToSubjects nodesAfterTitle
+            { cicloEscolar = firstText titleNode
+            , materias = nodesToSubjects nodesAfterTitle
             }
 
         _ ->
-            Semester Nothing []
+            PeriodoCursado Nothing []
 
 
-nodesToSubjects : List Html.Parser.Node -> List Subject
+nodesToSubjects : List Html.Parser.Node -> List MateriaCursada
 nodesToSubjects nodesAfterTitle =
     case nodesAfterTitle of
         (Html.Parser.Element _ _ ((Html.Parser.Element _ _ subjectNodes) :: _)) :: _ ->
@@ -180,7 +180,7 @@ nodesToSubjects nodesAfterTitle =
             []
 
 
-tableRowToSubject : Html.Parser.Node -> Subject
+tableRowToSubject : Html.Parser.Node -> MateriaCursada
 tableRowToSubject tableRow =
     case tableRow of
         Html.Parser.Element _ _ tableCells ->
