@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Css exposing (..)
 import Dict exposing (Dict)
+import Dict.Extra
 import File exposing (File)
 import File.Select as Select
 import Html.Parser
@@ -11,6 +12,7 @@ import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
 import Maybe.Extra
+import Set
 import Task
 
 
@@ -119,8 +121,162 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ text (Debug.toString (organizarKardexPorNombre (leerKardex (Html.Parser.runDocument model.content)))) ]
+            [ model.content
+                |> Html.Parser.runDocument
+                |> leerKardex
+                |> organizarKardexPorNombre
+                |> avanceDeMallaCurricular mallaCurricularIngSoftware
+                |> Debug.toString
+                |> text
+            ]
         ]
+
+
+type alias MallaCurricular =
+    { obligatorias : List (List String)
+    , optativas : List String
+    , libres : List String
+    }
+
+
+mallaCurricularIngSoftware : MallaCurricular
+mallaCurricularIngSoftware =
+    { obligatorias =
+        [ [ "Álgebra Intermedia"
+          , "Geometría Analítica"
+          , "Algoritmia"
+          , "Fundamentos de Ingeniería de Software"
+          , "Responsabilidad Social Universitaria"
+          ]
+        , [ "Álgebra Superior"
+          , "Cálculo Diferencial"
+          , "Programación Estructurada"
+          , "Matemáticas Discretas"
+          , "Cultura Maya"
+          ]
+        , [ "Álgebra Lineal"
+          , "Cálculo Integral"
+          , "Programación Orientada a Objetos"
+          , "Teoría de la Computación"
+          , "Arquitectura y Organización de Computadoras"
+          ]
+        , [ "Probabilidad"
+          , "Diseño de Software"
+          , "Estructuras de Datos"
+          , "Sistemas Operativos"
+          , "Teoría de Lenguajes de Programación"
+          ]
+        , [ "Inferencia Estadística"
+          , "Arquitecturas de Software"
+          , "Construcción de Software"
+          , "Diseño de Bases de Datos"
+          , "Desarrollo de Aplicaciones Web"
+          ]
+        , [ "Métricas de Software"
+          , "Aseguramiento de la Calidad del Software"
+          , "Requisitos de Software"
+          , "Interacción Humano Computadora"
+          ]
+        , [ "Experimentación en Ingeniería de Software"
+          , "Verificación y Validación de Software"
+          , "Redes y Seguridad de Computadoras"
+          , "Innovación Tecnológica"
+          ]
+        , [ "Administración de Proyectos I"
+          , "Mantenimiento de Software"
+          , "Sistemas Distribuidos"
+          ]
+        , [ "Administración de Proyectos II" ]
+        ]
+    , optativas = []
+    , libres = []
+    }
+
+
+type alias AvanceDeMallaCurricular =
+    { etiqueta : String
+    , materias : List ( String, List MateriaCursada )
+    }
+
+
+materiasFueraDeLaMallaCurricular : MallaCurricular -> Dict String (List MateriaCursada) -> List ( String, List MateriaCursada )
+materiasFueraDeLaMallaCurricular { obligatorias, optativas, libres } materias =
+    materias
+        |> Dict.Extra.removeMany (Set.fromList (List.concat [ optativas, libres, List.concat obligatorias ]))
+        |> Dict.toList
+
+
+avanceDeMallaCurricular : MallaCurricular -> Dict String (List MateriaCursada) -> List AvanceDeMallaCurricular
+avanceDeMallaCurricular { obligatorias, optativas, libres } materiasCursadas =
+    List.concat
+        [ List.indexedMap (avanceSemestral materiasCursadas) obligatorias
+        , [ { etiqueta = "Optativas"
+            , materias =
+                materiasCursadas
+                    |> Dict.Extra.keepOnly (Set.fromList optativas)
+                    |> Dict.toList
+            }
+          , { etiqueta = "Libres"
+            , materias =
+                materiasCursadas
+                    |> Dict.Extra.keepOnly (Set.fromList libres)
+                    |> Dict.toList
+            }
+          ]
+        ]
+
+
+avanceSemestral : Dict String (List MateriaCursada) -> Int -> List String -> AvanceDeMallaCurricular
+avanceSemestral materiasCursadas index materiasDelSemestre =
+    { etiqueta = indexToString (index + 1) ++ " Semestre"
+    , materias =
+        materiasDelSemestre
+            |> List.map
+                (\materia ->
+                    ( materia
+                    , materiasCursadas
+                        |> Dict.get materia
+                        |> Maybe.withDefault []
+                    )
+                )
+    }
+
+
+indexToString : Int -> String
+indexToString index =
+    case index of
+        1 ->
+            "Primer"
+
+        2 ->
+            "Segundo"
+
+        3 ->
+            "Tercer"
+
+        4 ->
+            "Cuarto"
+
+        5 ->
+            "Quinto"
+
+        6 ->
+            "Sexto"
+
+        7 ->
+            "Séptimo"
+
+        8 ->
+            "Octavo"
+
+        9 ->
+            "Noveno"
+
+        10 ->
+            "Décimo"
+
+        _ ->
+            String.fromInt index ++ "°"
 
 
 organizarKardexPorNombre : List PeriodoCursado -> Dict String (List MateriaCursada)
