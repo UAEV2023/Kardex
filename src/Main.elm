@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Css exposing (..)
+import Dict exposing (Dict)
 import File exposing (File)
 import File.Select as Select
 import Html.Parser
@@ -118,8 +119,42 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ text (Debug.toString (leerKardex (Html.Parser.runDocument model.content))) ]
+            [ text (Debug.toString (organizarKardexPorNombre (leerKardex (Html.Parser.runDocument model.content)))) ]
         ]
+
+
+organizarKardexPorNombre : List PeriodoCursado -> Dict String (List MateriaCursada)
+organizarKardexPorNombre kardex =
+    organizarMateriasCurzadasPorNombre
+        (kardex |> List.concatMap .materias)
+        Dict.empty
+
+
+organizarMateriasCurzadasPorNombre : List MateriaCursada -> Dict String (List MateriaCursada) -> Dict String (List MateriaCursada)
+organizarMateriasCurzadasPorNombre materias acumulador =
+    case materias of
+        [] ->
+            acumulador
+
+        materia :: siguientesMaterias ->
+            case materia.asignatura of
+                Just nombreDeAsignatura ->
+                    addToDictList nombreDeAsignatura materia acumulador
+                        |> organizarMateriasCurzadasPorNombre siguientesMaterias
+
+                Nothing ->
+                    acumulador
+                        |> organizarMateriasCurzadasPorNombre siguientesMaterias
+
+
+addToDictList : comparable -> value -> Dict comparable (List value) -> Dict comparable (List value)
+addToDictList key value dict =
+    case Dict.get key dict of
+        Just previousKeys ->
+            Dict.insert key (previousKeys ++ [ value ]) dict
+
+        _ ->
+            Dict.insert key [ value ] dict
 
 
 leerKardex : Result (List a) Html.Parser.Document -> List PeriodoCursado
