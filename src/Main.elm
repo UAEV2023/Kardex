@@ -135,9 +135,23 @@ semesters docResult =
             []
 
 
+type alias Subject =
+    { asignatura : Maybe String
+    , calificacion : Maybe String
+    , situacion : Maybe String
+    , creditos : Maybe String
+    , tipoDeExamen : Maybe String
+    }
+
+
+emptySubject : Subject
+emptySubject =
+    Subject Nothing Nothing Nothing Nothing Nothing
+
+
 type alias Semester =
     { title : Maybe String
-    , subjects : List String
+    , subjects : List Subject
     }
 
 
@@ -146,11 +160,44 @@ nodeToSemester node =
     case node of
         Html.Parser.Element _ _ ((Html.Parser.Element _ _ (titleNode :: nodesAfterTitle)) :: _) ->
             { title = firstText titleNode
-            , subjects = []
+            , subjects = nodesToSubjects nodesAfterTitle
             }
 
         _ ->
             Semester Nothing []
+
+
+nodesToSubjects : List Html.Parser.Node -> List Subject
+nodesToSubjects nodesAfterTitle =
+    case nodesAfterTitle of
+        (Html.Parser.Element _ _ ((Html.Parser.Element _ _ subjectNodes) :: _)) :: _ ->
+            subjectNodes
+                |> findByElementInNodeList "tbody"
+                |> findByElementInNodeList "tr"
+                |> List.map tableRowToSubject
+
+        _ ->
+            []
+
+
+tableRowToSubject : Html.Parser.Node -> Subject
+tableRowToSubject tableRow =
+    case tableRow of
+        Html.Parser.Element _ _ tableCells ->
+            case tableCells |> List.map firstText of
+                [ asignatura, calificacion, situacion, creditos, tipoDeExamen ] ->
+                    { asignatura = asignatura
+                    , calificacion = calificacion
+                    , situacion = situacion
+                    , creditos = creditos
+                    , tipoDeExamen = tipoDeExamen
+                    }
+
+                _ ->
+                    emptySubject
+
+        _ ->
+            emptySubject
 
 
 firstText : Html.Parser.Node -> Maybe String
@@ -187,6 +234,30 @@ findByClassInNode class node =
 
             else
                 findByClassInNodeList class nodes
+
+        _ ->
+            []
+
+
+findByElementInNodeList : String -> List Html.Parser.Node -> List Html.Parser.Node
+findByElementInNodeList element nodes =
+    case nodes of
+        [] ->
+            []
+
+        node :: nextNodes ->
+            findByElementInNode element node ++ findByElementInNodeList element nextNodes
+
+
+findByElementInNode : String -> Html.Parser.Node -> List Html.Parser.Node
+findByElementInNode elementToMatch node =
+    case node of
+        Html.Parser.Element element _ nodes ->
+            if elementToMatch == element then
+                [ node ]
+
+            else
+                findByElementInNodeList elementToMatch nodes
 
         _ ->
             []
