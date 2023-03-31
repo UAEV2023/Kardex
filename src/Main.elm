@@ -339,6 +339,97 @@ mallaCurricularIngSoftware =
     }
 
 
+mallaCurricularBachilleratoEnLinea : MallaCurricular
+mallaCurricularBachilleratoEnLinea =
+    { obligatorias =
+        [ [ "Desarrollo del lenguaje algebraico"
+          , "Estructura y organización de la naturaleza"
+          , "Desarrollo del pensamiento científico"
+          , "Cultura Maya"
+          , "Comprensión lectora y organización de la información"
+          , "Beginner 1"
+          , "Desarrollo del individuo"
+          , "Formación ocupacional 1"
+          ]
+        , [ "Solución de problemas con ecuaciones"
+          , "Dinámica de la naturaleza"
+          , "Desarrollo del pensamiento filosófico"
+          , "Desarrollo de la argumentación"
+          , "Beginner 2"
+          , "Responsabilidad social"
+          , "Formación ocupacional 2"
+          ]
+        , [ "Trigonometría y geometría"
+          , "Seres vivos y adaptación a su ambiente"
+          , "Transformaciones del mundo contemporáneo"
+          , "El derecho en la vida ciudadana"
+          , "Elaboración de escritos académicos"
+          , "Elementary 1"
+          , "Formación ocupacional 3"
+          ]
+        , [ "Desigualdades y funciones algebraicas"
+          , "Bioenergética"
+          , "Problemas éticos y morales"
+          , "Análisis e interpretación literaria 1"
+          , "Elementary 2"
+          , "Formación ocupacional 4"
+          ]
+        , [ "Funciones y series matemáticas"
+          , "Sistemas biológicos y ambientales"
+          , "De la independencia a la globalización en Méxito y Yucatán"
+          , "Pre - intermediate 1"
+          , "Mi filosofía de vida"
+          , "Formación ocupacional 5"
+          ]
+        , [ "La estadística y la vida"
+          , "Diagnóstico e intervención ambiental"
+          , "Administración y liderazgo emprendedor"
+          , "Trascendencia social"
+          , "Formación ocupacional 6"
+          ]
+        ]
+    , optativas =
+        [ "Promoción del pensamiento lógico-deductivo"
+        , "Sexualidad Humana"
+        , "Temas actuales de psicologìa"
+        , "Desarrollo del pensamiento lógico-deductivo"
+        , "Temas de álgebra"
+        , "Reinos eubacteria, archeobacteria, prozoa"
+        , "Filosofía práctica"
+        , "Apreciación del arte"
+        , "Antropología cultural"
+        , "Trigonometría y geometrìa analìtica avanzada"
+        , "Reino fungi y plantae"
+        , "Reino animalia"
+        , "Problemas de nutrición"
+        , "Introducción a las ciencias políticas"
+        , "Ética aplicada"
+        , "Historia prehispánica y colonial en Yucatán"
+        , "Cálculo diferencial"
+        , "Sistema de cuerpo humano 1"
+        , "La naturaleza en movimiento"
+        , "Desarrollo económico"
+        , "Redacción de cuento"
+        , "Redacción de novela"
+        , "Análisis e interpretación literaria 2"
+        , "Lengua maya 1"
+        , "Investigación de mercados"
+        , "Contribuciones fiscales"
+        , "Estructuras de bases de datos"
+        , "Algoritmos"
+        , "Cálculo integral"
+        , "Sistema del cuerpo humano 2"
+        , "Química y metabolismo"
+        , "Bioquímica de la energía"
+        , "Administración financiera"
+        , "Redacción de poesía contemporánea"
+        , "Inglés técnico"
+        , "Lengua maya 2"
+        ]
+    , libres = []
+    }
+
+
 type alias AvanceDeMallaCurricular =
     { etiqueta : String
     , materias : List ( String, List MateriaCursada )
