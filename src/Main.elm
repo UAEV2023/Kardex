@@ -111,29 +111,30 @@ hijackOn event decoder =
 
 view : Model -> Html Msg
 view model =
-    styled div
-        [ border3 (px 2) dashed (rgb 11 14 17)
-        , borderRadius (rem 1)
-        , width (pct 80)
-        , height (rem 8)
-        ]
-        [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
-        , hijackOn "dragover" (Decode.succeed DragEnter)
-        , on "dragenter" (Decode.succeed DragEnter)
-        , on "dragleave" (Decode.succeed DragLeave)
-        ]
-        [ button [ onClick Pick ] [ text "Upload Images" ]
-        , styled span
-            [ color (rgb 11 14 17) ]
-            []
-            [ model.kardex
-                |> Maybe.withDefault []
+    case model.kardex of
+        Nothing ->
+            styled div
+                [ border3 (px 2) dashed (rgb 11 14 17)
+                , borderRadius (rem 1)
+                , width (pct 80)
+                , height (rem 8)
+                ]
+                [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
+                , hijackOn "dragover" (Decode.succeed DragEnter)
+                , on "dragenter" (Decode.succeed DragEnter)
+                , on "dragleave" (Decode.succeed DragLeave)
+                ]
+                [ button
+                    [ onClick Pick ]
+                    [ text "Subir Kardex" ]
+                ]
+
+        Just kardex ->
+            kardex
                 |> organizarKardexPorNombre
                 |> avanceDeMallaCurricular mallaCurricularIngSoftware
                 |> Debug.toString
                 |> text
-            ]
-        ]
 
 
 type alias MallaCurricular =
