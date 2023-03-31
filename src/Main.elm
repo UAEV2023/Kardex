@@ -128,6 +128,7 @@ view model =
                 [ button
                     [ onClick Pick ]
                     [ text "Subir Kardex" ]
+                , text (Debug.toString model.files)
                 ]
 
         Just kardex ->
