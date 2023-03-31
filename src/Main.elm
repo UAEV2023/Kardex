@@ -25,6 +25,7 @@ type alias Model =
     { hover : Bool
     , files : List File
     , kardex : Maybe (List PeriodoCursado)
+    , mallaCurricular : Maybe MallaCurricular
     }
 
 
@@ -33,6 +34,7 @@ init =
     ( { hover = False
       , files = []
       , kardex = Nothing
+      , mallaCurricular = Nothing
       }
     , Cmd.none
     )
@@ -48,6 +50,7 @@ type Msg
     | DragLeave
     | GotFiles File (List File)
     | GotKardex (Maybe (List PeriodoCursado))
+    | SelectMallaCurricular String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,6 +89,16 @@ update msg model =
             , Cmd.none
             )
 
+        SelectMallaCurricular index ->
+            ( { model
+                | mallaCurricular =
+                    mallasCurriculares
+                        |> List.Extra.getAt (index |> String.toInt |> Maybe.withDefault -1)
+                        |> Maybe.map Tuple.second
+              }
+            , Cmd.none
+            )
+
 
 
 ---- VIEW ----
@@ -110,28 +123,17 @@ hijackOn event decoder =
     custom event (Decode.map alwaysPreventDefault decoder)
 
 
+opcionMallaCurricular : Int -> ( String, a ) -> Html msg
+opcionMallaCurricular index ( nombre, _ ) =
+    option
+        [ Attributes.value (String.fromInt index) ]
+        [ text nombre ]
+
+
 view : Model -> Html Msg
 view model =
-    case model.kardex of
-        Nothing ->
-            styled div
-                [ border3 (px 2) dashed (rgb 11 14 17)
-                , borderRadius (rem 1)
-                , width (pct 80)
-                , height (rem 8)
-                ]
-                [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
-                , hijackOn "dragover" (Decode.succeed DragEnter)
-                , on "dragenter" (Decode.succeed DragEnter)
-                , on "dragleave" (Decode.succeed DragLeave)
-                ]
-                [ button
-                    [ onClick Pick ]
-                    [ text "Subir Kardex" ]
-                , text (Debug.toString model.files)
-                ]
-
-        Just kardex ->
+    case ( model.kardex, model.mallaCurricular ) of
+        ( Just kardex, Just mallaCurricular ) ->
             let
                 kardexPorNombre =
                     organizarKardexPorNombre kardex
@@ -140,7 +142,7 @@ view model =
                 []
                 (List.concat
                     [ kardexPorNombre
-                        |> avanceDeMallaCurricular mallaCurricularIngSoftware
+                        |> avanceDeMallaCurricular mallaCurricular
                         |> List.map mostrarMallaCurricular
                     , [ styled div
                             [ marginBottom (rem 2) ]
@@ -156,13 +158,46 @@ view model =
                                 ]
                                 []
                                 (kardexPorNombre
-                                    |> materiasFueraDeLaMallaCurricular mallaCurricularIngSoftware
+                                    |> materiasFueraDeLaMallaCurricular mallaCurricular
                                     |> List.map mostrarMateria
                                 )
                             ]
                       ]
                     ]
                 )
+
+        _ ->
+            div []
+                [ styled select
+                    [ width (rem 20)
+                    , padding2 (rem 0.25) (rem 0.5)
+                    ]
+                    [ onInput SelectMallaCurricular ]
+                    (option
+                        [ Attributes.disabled True
+                        , Attributes.selected True
+                        , Attributes.value ""
+                        ]
+                        []
+                        :: (mallasCurriculares |> List.indexedMap opcionMallaCurricular)
+                    )
+                , styled div
+                    [ border3 (px 2) dashed (rgb 11 14 17)
+                    , borderRadius (rem 1)
+                    , width (pct 80)
+                    , height (rem 8)
+                    ]
+                    [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
+                    , hijackOn "dragover" (Decode.succeed DragEnter)
+                    , on "dragenter" (Decode.succeed DragEnter)
+                    , on "dragleave" (Decode.succeed DragLeave)
+                    ]
+                    [ button
+                        [ onClick Pick ]
+                        [ text "Subir Kardex" ]
+                    , text (Debug.toString model.files)
+                    ]
+                ]
 
 
 mostrarMallaCurricular : AvanceDeMallaCurricular -> Html msg
@@ -428,6 +463,13 @@ mallaCurricularBachilleratoEnLinea =
         ]
     , libres = []
     }
+
+
+mallasCurriculares : List ( String, MallaCurricular )
+mallasCurriculares =
+    [ ( "Licenciatura en Ingeniería de Software", mallaCurricularIngSoftware )
+    , ( "Bachillerato en Línea", mallaCurricularBachilleratoEnLinea )
+    ]
 
 
 type alias AvanceDeMallaCurricular =
