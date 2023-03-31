@@ -161,7 +161,11 @@ view model =
             [ button
                 [ onClick Pick ]
                 [ text "Subir Kardex" ]
-            , text (Debug.toString model.files)
+            , text
+                (model.files
+                    |> List.map File.name
+                    |> String.join ", "
+                )
             ]
         , styled div
             [ property "display" "grid"
