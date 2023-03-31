@@ -11,6 +11,7 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
+import List.Extra
 import Maybe.Extra
 import Set
 import Task
@@ -130,11 +131,65 @@ view model =
                 ]
 
         Just kardex ->
-            kardex
-                |> organizarKardexPorNombre
-                |> avanceDeMallaCurricular mallaCurricularIngSoftware
-                |> Debug.toString
-                |> text
+            div
+                []
+                (kardex
+                    |> organizarKardexPorNombre
+                    |> avanceDeMallaCurricular mallaCurricularIngSoftware
+                    |> List.map mostrarMallaCurricular
+                )
+
+
+mostrarMallaCurricular : AvanceDeMallaCurricular -> Html msg
+mostrarMallaCurricular { etiqueta, materias } =
+    styled div
+        [ marginBottom (rem 2) ]
+        []
+        [ h2 [] [ text etiqueta ]
+        , styled div
+            [ property "display" "grid"
+            , property "grid-gap" "1.6rem"
+            , property "grid-template-columns" "repeat(auto-fit, 12rem)"
+            , property "justify-content" "center"
+            , property "align-items" "start"
+            ]
+            []
+            (materias |> List.map mostrarMateria)
+        ]
+
+
+mostrarMateria : ( String, List MateriaCursada ) -> Html msg
+mostrarMateria ( nombre, intentos ) =
+    styled div
+        [ property "display" "grid"
+        , border3 (px 1) solid (rgb 11 14 17)
+        , borderRadius (px 5)
+        , padding (rem 0.5)
+        ]
+        []
+        [ styled div
+            [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8)
+            , paddingBottom (rem 0.4)
+            , marginBottom (rem 0.4)
+            ]
+            []
+            [ text nombre ]
+        , mostrarEstado intentos
+        ]
+
+
+mostrarEstado : List MateriaCursada -> Html msg
+mostrarEstado intentos =
+    case List.Extra.last intentos of
+        Just { situacion } ->
+            div []
+                [ situacion
+                    |> Maybe.withDefault "???"
+                    |> text
+                ]
+
+        Nothing ->
+            div [] [ text "Sin Intentos" ]
 
 
 type alias MallaCurricular =
