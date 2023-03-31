@@ -131,12 +131,36 @@ view model =
                 ]
 
         Just kardex ->
+            let
+                kardexPorNombre =
+                    organizarKardexPorNombre kardex
+            in
             div
                 []
-                (kardex
-                    |> organizarKardexPorNombre
-                    |> avanceDeMallaCurricular mallaCurricularIngSoftware
-                    |> List.map mostrarMallaCurricular
+                (List.concat
+                    [ kardexPorNombre
+                        |> avanceDeMallaCurricular mallaCurricularIngSoftware
+                        |> List.map mostrarMallaCurricular
+                    , [ styled div
+                            [ marginBottom (rem 2) ]
+                            []
+                            [ h2 [] [ text "Otros" ]
+                            , p [] [ text "Si una materia se encuentra aquí es porque la malla curricular esta incompleta. Favor de reportarlo al desarrollador" ]
+                            , styled div
+                                [ property "display" "grid"
+                                , property "grid-gap" "1.6rem"
+                                , property "grid-template-columns" "repeat(auto-fit, 12rem)"
+                                , property "justify-content" "center"
+                                , property "align-items" "start"
+                                ]
+                                []
+                                (kardexPorNombre
+                                    |> materiasFueraDeLaMallaCurricular mallaCurricularIngSoftware
+                                    |> List.map mostrarMateria
+                                )
+                            ]
+                      ]
+                    ]
                 )
 
 
