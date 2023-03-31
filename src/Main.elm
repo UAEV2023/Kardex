@@ -23,7 +23,7 @@ import Task
 type alias Model =
     { hover : Bool
     , files : List File
-    , content : String
+    , kardex : Maybe (List PeriodoCursado)
     }
 
 
@@ -31,7 +31,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { hover = False
       , files = []
-      , content = ""
+      , kardex = Nothing
       }
     , Cmd.none
     )
@@ -46,7 +46,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
-    | GotContent String
+    | GotKardex (Maybe (List PeriodoCursado))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -72,11 +72,16 @@ update msg model =
                 | files = file :: files
                 , hover = False
               }
-            , Task.perform GotContent (File.toString file)
+            , Task.perform GotKardex
+                (File.toString file
+                    |> Task.map Html.Parser.runDocument
+                    |> Task.map leerKardex
+                    |> Task.map Just
+                )
             )
 
-        GotContent content ->
-            ( { model | content = content }
+        GotKardex content ->
+            ( { model | kardex = content }
             , Cmd.none
             )
 
@@ -121,9 +126,8 @@ view model =
         , styled span
             [ color (rgb 11 14 17) ]
             []
-            [ model.content
-                |> Html.Parser.runDocument
-                |> leerKardex
+            [ model.kardex
+                |> Maybe.withDefault []
                 |> organizarKardexPorNombre
                 |> avanceDeMallaCurricular mallaCurricularIngSoftware
                 |> Debug.toString
