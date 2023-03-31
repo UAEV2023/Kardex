@@ -320,8 +320,21 @@ mallaCurricularIngSoftware =
           ]
         , [ "Administración de Proyectos II" ]
         ]
-    , optativas = []
-    , libres = []
+    , optativas =
+        [ "AWS Academy Cloud Foundations"
+        , "CCNA Redes empresariales, seguridad y automatización"
+        , "Clean Architecture Principles"
+        , "Desarrollo Web Ágil de API y SPA"
+        , "Optimización de Aplicaciones Web"
+        , "Programación de robots móviles"
+        , "Secure Programming"
+        ]
+    , libres =
+        [ "Expresión, Actuación, Comunicación y Creación Escénica"
+        , "Formación y Manejo de Equipos de Trabajo"
+        , "Herramientas para la Comunicación Científica"
+        , "Introducción al Dibujo Artístico"
+        ]
     }
 
 
