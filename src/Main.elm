@@ -174,8 +174,37 @@ mostrarMateria ( nombre, intentos ) =
             ]
             []
             [ text nombre ]
+        , if List.length intentos > 0 then
+            styled div
+                [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8)
+                , paddingBottom (rem 0.4)
+                , marginBottom (rem 0.4)
+                ]
+                []
+                [ (intentos
+                    |> List.length
+                    |> String.fromInt
+                  )
+                    ++ (intentos
+                            |> List.length
+                            |> foo " intento"
+                       )
+                    |> text
+                ]
+
+          else
+            text ""
         , mostrarEstado intentos
         ]
+
+
+foo : String -> Int -> String
+foo word n =
+    if n == 1 then
+        word
+
+    else
+        word ++ "s"
 
 
 mostrarEstado : List MateriaCursada -> Html msg
