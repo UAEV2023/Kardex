@@ -141,7 +141,14 @@ view model =
         ]
         []
         [ styled div
-            [ border3 (px 2) dashed (rgb 11 14 17)
+            [ border3 (px 2)
+                dashed
+                (if model.hover then
+                    rgb 23 166 226
+
+                 else
+                    rgb 11 14 17
+                )
             , borderRadius (rem 1)
             , width (pct 80)
             , height (rem 8)
