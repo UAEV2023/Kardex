@@ -132,72 +132,92 @@ opcionMallaCurricular index ( nombre, _ ) =
 
 view : Model -> Html Msg
 view model =
-    case ( model.kardex, model.mallaCurricular ) of
-        ( Just kardex, Just mallaCurricular ) ->
-            let
-                kardexPorNombre =
-                    organizarKardexPorNombre kardex
-            in
-            div
-                []
-                (List.concat
-                    [ kardexPorNombre
-                        |> avanceDeMallaCurricular mallaCurricular
-                        |> List.map mostrarMallaCurricular
-                    , [ styled div
-                            [ marginBottom (rem 2) ]
-                            []
-                            [ h2 [] [ text "Otros" ]
-                            , p [] [ text "Si una materia se encuentra aquí es porque la malla curricular esta incompleta. Favor de reportarlo al desarrollador" ]
-                            , styled div
-                                [ property "display" "grid"
-                                , property "grid-gap" "1.6rem"
-                                , property "grid-template-columns" "repeat(auto-fit, 12rem)"
-                                , property "justify-content" "center"
-                                , property "align-items" "start"
-                                ]
-                                []
-                                (kardexPorNombre
-                                    |> materiasFueraDeLaMallaCurricular mallaCurricular
-                                    |> List.map mostrarMateria
-                                )
-                            ]
-                      ]
-                    ]
-                )
-
-        _ ->
-            div []
-                [ styled select
-                    [ width (rem 20)
-                    , padding2 (rem 0.25) (rem 0.5)
-                    ]
-                    [ onInput SelectMallaCurricular ]
-                    (option
-                        [ Attributes.disabled True
-                        , Attributes.selected True
-                        , Attributes.value ""
-                        ]
-                        []
-                        :: (mallasCurriculares |> List.indexedMap opcionMallaCurricular)
-                    )
-                , styled div
-                    [ border3 (px 2) dashed (rgb 11 14 17)
-                    , borderRadius (rem 1)
-                    , width (pct 80)
-                    , height (rem 8)
-                    ]
-                    [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
-                    , hijackOn "dragover" (Decode.succeed DragEnter)
-                    , on "dragenter" (Decode.succeed DragEnter)
-                    , on "dragleave" (Decode.succeed DragLeave)
-                    ]
-                    [ button
-                        [ onClick Pick ]
-                        [ text "Subir Kardex" ]
-                    , text (Debug.toString model.files)
-                    ]
+    styled div
+        [ property "display" "grid"
+        , property "grid-template-columns" "1fr"
+        , property "justify-items" "center"
+        , property "grid-gap" "1rem"
+        , padding2 (rem 2) (rem 4)
+        ]
+        []
+        [ styled div
+            [ border3 (px 2) dashed (rgb 11 14 17)
+            , borderRadius (rem 1)
+            , width (pct 80)
+            , height (rem 8)
+            ]
+            [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
+            , hijackOn "dragover" (Decode.succeed DragEnter)
+            , on "dragenter" (Decode.succeed DragEnter)
+            , on "dragleave" (Decode.succeed DragLeave)
+            ]
+            [ button
+                [ onClick Pick ]
+                [ text "Subir Kardex" ]
+            , text (Debug.toString model.files)
+            ]
+        , styled div
+            [ property "display" "grid"
+            , property "grid-template-columns" "auto auto"
+            , property "align-items" "center"
+            , property "grid-gap" "0.5rem"
+            ]
+            []
+            [ label [ Attributes.for "malla-curricular" ] [ text "Seleccionar malla curricular:" ]
+            , styled select
+                [ width (rem 20)
+                , padding2 (rem 0.25) (rem 0.5)
                 ]
+                [ Attributes.id "malla-curricular"
+                , onInput SelectMallaCurricular
+                ]
+                (option
+                    [ Attributes.disabled True
+                    , Attributes.selected True
+                    , Attributes.value ""
+                    ]
+                    []
+                    :: (mallasCurriculares |> List.indexedMap opcionMallaCurricular)
+                )
+            ]
+        , case ( model.kardex, model.mallaCurricular ) of
+            ( Just kardex, Just mallaCurricular ) ->
+                let
+                    kardexPorNombre =
+                        organizarKardexPorNombre kardex
+                in
+                styled div
+                    [ property "justify-self" "stretch" ]
+                    []
+                    (List.concat
+                        [ kardexPorNombre
+                            |> avanceDeMallaCurricular mallaCurricular
+                            |> List.map mostrarMallaCurricular
+                        , [ styled div
+                                [ marginBottom (rem 2) ]
+                                []
+                                [ h2 [] [ text "Otros" ]
+                                , p [] [ text "Si una materia se encuentra aquí es porque la malla curricular está incompleta o tiene errores de ortografía. Favor de reportarlo al desarrollador" ]
+                                , styled div
+                                    [ property "display" "grid"
+                                    , property "grid-gap" "1.6rem"
+                                    , property "grid-template-columns" "repeat(auto-fit, 12rem)"
+                                    , property "justify-content" "center"
+                                    , property "align-items" "start"
+                                    ]
+                                    []
+                                    (kardexPorNombre
+                                        |> materiasFueraDeLaMallaCurricular mallaCurricular
+                                        |> List.map mostrarMateria
+                                    )
+                                ]
+                          ]
+                        ]
+                    )
+
+            _ ->
+                text ""
+        ]
 
 
 mostrarMallaCurricular : AvanceDeMallaCurricular -> Html msg
