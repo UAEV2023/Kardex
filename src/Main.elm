@@ -182,14 +182,33 @@ mostrarEstado : List MateriaCursada -> Html msg
 mostrarEstado intentos =
     case List.Extra.last intentos of
         Just { situacion } ->
-            div []
+            styled div
+                [ backgroundColor (colorDeSituacion situacion intentos)
+                ]
+                []
                 [ situacion
                     |> Maybe.withDefault "???"
                     |> text
                 ]
 
         Nothing ->
-            div [] [ text "Sin Intentos" ]
+            styled div
+                [ backgroundColor (rgba 64 64 64 0.4) ]
+                []
+                [ text "Sin Intentos" ]
+
+
+colorDeSituacion : Maybe String -> List a -> Color
+colorDeSituacion situacion intentos =
+    case ( situacion, List.length intentos ) of
+        ( Just "No Acreditado", 1 ) ->
+            rgba 231 143 12 0.6
+
+        ( Just "No Acreditado", _ ) ->
+            rgba 231 12 12 0.6
+
+        _ ->
+            rgb 255 255 255
 
 
 type alias MallaCurricular =
