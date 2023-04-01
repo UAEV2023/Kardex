@@ -500,6 +500,60 @@ mallasCurriculares : List ( String, MallaCurricular )
 mallasCurriculares =
     [ ( "Licenciatura en Ingeniería de Software", mallaCurricularIngSoftware )
     , ( "Bachillerato en Línea", mallaCurricularBachilleratoEnLinea )
+    , ( "Licenciatura en Literatura Latinoamericana"
+      , { obligatorias =
+            [ [ "Literatura Española, Siglos XIII al XVI"
+              , "Literatura de los Pueblos Originarios de América, Siglos XVI al XVIII"
+              , "Semiótica Cultural"
+              , "Cultura y Pensamiento del Renacimiento Europeo"
+              , "Redacción de Textos Académicos"
+              , "Responsabilidad Social Universitaria"
+              ]
+            , [ "Literatura de la América Virreinal"
+              , "Literatura de la Nueva España"
+              , "Narratología"
+              , "Cultura y Pensamiento de la América Virreinal"
+              , "Corrección de Textos"
+              , "Cultura Maya"
+              ]
+            , [ "Literatura Latinoamericana del Siglo XIX"
+              , "Literatura Mexicana del Siglo XIX"
+              , "Literatura de los Pueblos Originarios de América, Siglos XIX al XXI"
+              , "Poéticas Clásicas Occidentales"
+              , "Cultura y Pensamiento del Siglo XIX"
+              , "Lengua Maya"
+              ]
+            , [ "Literatura Latinoamericana del Siglo XX"
+              , "Literatura Mexicana del Siglo XX"
+              , "Literatura Maya Contemporánea"
+              , "Literatura y Sociedad"
+              , "Cultura y Pensamiento del Siglo XX"
+              , "Diseño y Producción de Publicaciones"
+              ]
+            , [ "Literatura del Siglo XXI"
+              , "Literatura Caribeña"
+              , "Seminario de Investigación I"
+              , "Literatura y Recepción"
+              , "Corrientes Actuales de Pensamiento"
+              , "Didáctica de la Literatura"
+              ]
+            , [ "Literatura de Yucatán"
+              , "Seminario de Investigación II"
+              , "Literatura y Sistemas"
+              , "Formación de Públicos Lectores"
+              , "Mediación de Aprendizajes"
+              ]
+            , [ "Seminario de Titulación I"
+              , "Cultura Emprendedora"
+              ]
+            , [ "Seminario de Titulación II"
+              , "Prácticas Profesionales"
+              ]
+            ]
+        , optativas = []
+        , libres = []
+        }
+      )
     ]
 
 
