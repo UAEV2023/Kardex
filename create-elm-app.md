@@ -87,7 +87,7 @@ const db = new PouchDB('mydb');
 ```sh
 my-app/
 ├── .gitignore
-├── README.md
+├── create-elm-app.md
 ├── elm.json
 ├── elm-stuff
 ├── public
