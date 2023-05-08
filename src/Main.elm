@@ -24,8 +24,8 @@ import Task
 type alias Model =
     { hover : Bool
     , files : List File
-    , kardex : Maybe (List PeriodoCursado)
-    , mallaCurricular : Maybe MallaCurricular
+    , kardex : Maybe (List Period)
+    , curriculum : Maybe Curriculum
     }
 
 
@@ -34,7 +34,7 @@ init =
     ( { hover = False
       , files = []
       , kardex = Nothing
-      , mallaCurricular = Nothing
+      , curriculum = Nothing
       }
     , Cmd.none
     )
@@ -49,8 +49,8 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
-    | GotKardex (Maybe (List PeriodoCursado))
-    | SelectMallaCurricular String
+    | GotKardex (Maybe (List Period))
+    | SelectCurriculum String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -79,7 +79,7 @@ update msg model =
             , Task.perform GotKardex
                 (File.toString file
                     |> Task.map Html.Parser.runDocument
-                    |> Task.map leerKardex
+                    |> Task.map readKardex
                     |> Task.map Just
                 )
             )
@@ -89,10 +89,10 @@ update msg model =
             , Cmd.none
             )
 
-        SelectMallaCurricular index ->
+        SelectCurriculum index ->
             ( { model
-                | mallaCurricular =
-                    mallasCurriculares
+                | curriculum =
+                    curriculums
                         |> List.Extra.getAt (index |> String.toInt |> Maybe.withDefault -1)
                         |> Maybe.map Tuple.second
               }
@@ -123,8 +123,8 @@ hijackOn event decoder =
     custom event (Decode.map alwaysPreventDefault decoder)
 
 
-opcionMallaCurricular : Int -> ( String, a ) -> Html msg
-opcionMallaCurricular index ( nombre, _ ) =
+curriculumToHtmlOption : Int -> ( String, a ) -> Html msg
+curriculumToHtmlOption index ( nombre, _ ) =
     option
         [ Attributes.value (String.fromInt index) ]
         [ text nombre ]
@@ -180,7 +180,7 @@ view model =
                 , padding2 (rem 0.25) (rem 0.5)
                 ]
                 [ Attributes.id "malla-curricular"
-                , onInput SelectMallaCurricular
+                , onInput SelectCurriculum
                 ]
                 (option
                     [ Attributes.disabled True
@@ -188,22 +188,22 @@ view model =
                     , Attributes.value ""
                     ]
                     []
-                    :: (mallasCurriculares |> List.indexedMap opcionMallaCurricular)
+                    :: (curriculums |> List.indexedMap curriculumToHtmlOption)
                 )
             ]
-        , case ( model.kardex, model.mallaCurricular ) of
-            ( Just kardex, Just mallaCurricular ) ->
+        , case ( model.kardex, model.curriculum ) of
+            ( Just kardex, Just curriculum ) ->
                 let
-                    kardexPorNombre =
+                    attemptsBySubjectName =
                         organizarKardexPorNombre kardex
                 in
                 styled div
                     [ property "justify-self" "stretch" ]
                     []
                     (List.concat
-                        [ kardexPorNombre
-                            |> avanceDeMallaCurricular mallaCurricular
-                            |> List.map mostrarMallaCurricular
+                        [ attemptsBySubjectName
+                            |> getCurriculumProgress curriculum
+                            |> List.map showSemesterProgress
                         , [ styled div
                                 [ marginBottom (rem 2) ]
                                 []
@@ -217,9 +217,9 @@ view model =
                                     , property "align-items" "start"
                                     ]
                                     []
-                                    (kardexPorNombre
-                                        |> materiasFueraDeLaMallaCurricular mallaCurricular
-                                        |> List.map mostrarMateria
+                                    (attemptsBySubjectName
+                                        |> getUnrecognizedSubjects curriculum
+                                        |> List.map showSubjectProgress
                                     )
                                 ]
                           ]
@@ -231,12 +231,12 @@ view model =
         ]
 
 
-mostrarMallaCurricular : AvanceDeMallaCurricular -> Html msg
-mostrarMallaCurricular { etiqueta, materias } =
+showSemesterProgress : SemesterProgress -> Html msg
+showSemesterProgress { semesterName, semesterProgress } =
     styled div
         [ marginBottom (rem 2) ]
         []
-        [ h2 [] [ text etiqueta ]
+        [ h2 [] [ text semesterName ]
         , styled div
             [ property "display" "grid"
             , property "grid-gap" "1.6rem"
@@ -245,12 +245,12 @@ mostrarMallaCurricular { etiqueta, materias } =
             , property "align-items" "start"
             ]
             []
-            (materias |> List.map mostrarMateria)
+            (semesterProgress |> List.map showSubjectProgress)
         ]
 
 
-mostrarMateria : ( String, List MateriaCursada ) -> Html msg
-mostrarMateria ( nombre, intentos ) =
+showSubjectProgress : ( String, List Attempt ) -> Html msg
+showSubjectProgress ( nombre, attempts ) =
     styled div
         [ property "display" "grid"
         , border3 (px 1) solid (rgb 11 14 17)
@@ -265,18 +265,18 @@ mostrarMateria ( nombre, intentos ) =
             ]
             []
             [ text nombre ]
-        , if List.length intentos > 0 then
+        , if List.length attempts > 0 then
             styled div
                 [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8)
                 , paddingBottom (rem 0.4)
                 , marginBottom (rem 0.4)
                 ]
                 []
-                [ (intentos
+                [ (attempts
                     |> List.length
                     |> String.fromInt
                   )
-                    ++ (intentos
+                    ++ (attempts
                             |> List.length
                             |> foo " intento"
                        )
@@ -285,7 +285,7 @@ mostrarMateria ( nombre, intentos ) =
 
           else
             text ""
-        , mostrarEstado intentos
+        , showLastSituation attempts
         ]
 
 
@@ -298,15 +298,15 @@ foo word n =
         word ++ "s"
 
 
-mostrarEstado : List MateriaCursada -> Html msg
-mostrarEstado intentos =
-    case List.Extra.last intentos of
-        Just { situacion } ->
+showLastSituation : List Attempt -> Html msg
+showLastSituation attempts =
+    case List.Extra.last attempts of
+        Just { situation } ->
             styled div
-                [ backgroundColor (colorDeSituacion situacion intentos)
+                [ backgroundColor (getSituationColor situation attempts)
                 ]
                 []
-                [ situacion
+                [ situation
                     |> Maybe.withDefault "???"
                     |> text
                 ]
@@ -318,9 +318,9 @@ mostrarEstado intentos =
                 [ text "Sin Intentos" ]
 
 
-colorDeSituacion : Maybe String -> List a -> Color
-colorDeSituacion situacion intentos =
-    case ( situacion, List.length intentos ) of
+getSituationColor : Maybe String -> List a -> Color
+getSituationColor situation attempts =
+    case ( situation, List.length attempts ) of
         ( Just "No Acreditado", 1 ) ->
             rgba 231 143 12 0.6
 
@@ -331,14 +331,14 @@ colorDeSituacion situacion intentos =
             rgb 255 255 255
 
 
-type alias MallaCurricular =
+type alias Curriculum =
     { obligatorias : List (List String)
     , optativas : List String
     , libres : List String
     }
 
 
-mallaCurricularIngSoftware : MallaCurricular
+mallaCurricularIngSoftware : Curriculum
 mallaCurricularIngSoftware =
     { obligatorias =
         [ [ "Álgebra Intermedia"
@@ -405,7 +405,7 @@ mallaCurricularIngSoftware =
     }
 
 
-mallaCurricularBachilleratoEnLinea : MallaCurricular
+mallaCurricularBachilleratoEnLinea : Curriculum
 mallaCurricularBachilleratoEnLinea =
     { obligatorias =
         [ [ "Desarrollo del Lenguaje Algebraico"
@@ -499,8 +499,8 @@ mallaCurricularBachilleratoEnLinea =
     }
 
 
-mallasCurriculares : List ( String, MallaCurricular )
-mallasCurriculares =
+curriculums : List ( String, Curriculum )
+curriculums =
     [ ( "Licenciatura en Ingeniería de Software", mallaCurricularIngSoftware )
     , ( "Bachillerato en Línea", mallaCurricularBachilleratoEnLinea )
     , ( "Licenciatura en Literatura Latinoamericana"
@@ -560,32 +560,32 @@ mallasCurriculares =
     ]
 
 
-type alias AvanceDeMallaCurricular =
-    { etiqueta : String
-    , materias : List ( String, List MateriaCursada )
+type alias SemesterProgress =
+    { semesterName : String
+    , semesterProgress : List ( String, List Attempt )
     }
 
 
-materiasFueraDeLaMallaCurricular : MallaCurricular -> Dict String (List MateriaCursada) -> List ( String, List MateriaCursada )
-materiasFueraDeLaMallaCurricular { obligatorias, optativas, libres } materias =
+getUnrecognizedSubjects : Curriculum -> Dict String (List Attempt) -> List ( String, List Attempt )
+getUnrecognizedSubjects { obligatorias, optativas, libres } materias =
     materias
         |> Dict.Extra.removeMany (Set.fromList (List.concat [ optativas, libres, List.concat obligatorias ]))
         |> Dict.toList
 
 
-avanceDeMallaCurricular : MallaCurricular -> Dict String (List MateriaCursada) -> List AvanceDeMallaCurricular
-avanceDeMallaCurricular { obligatorias, optativas, libres } materiasCursadas =
+getCurriculumProgress : Curriculum -> Dict String (List Attempt) -> List SemesterProgress
+getCurriculumProgress { obligatorias, optativas, libres } totalAttempts =
     List.concat
-        [ List.indexedMap (avanceSemestral materiasCursadas) obligatorias
-        , [ { etiqueta = "Optativas"
-            , materias =
-                materiasCursadas
+        [ List.indexedMap (getSemesterProgress totalAttempts) obligatorias
+        , [ { semesterName = "Optativas"
+            , semesterProgress =
+                totalAttempts
                     |> Dict.Extra.keepOnly (Set.fromList optativas)
                     |> Dict.toList
             }
-          , { etiqueta = "Libres"
-            , materias =
-                materiasCursadas
+          , { semesterName = "Libres"
+            , semesterProgress =
+                totalAttempts
                     |> Dict.Extra.keepOnly (Set.fromList libres)
                     |> Dict.toList
             }
@@ -593,15 +593,15 @@ avanceDeMallaCurricular { obligatorias, optativas, libres } materiasCursadas =
         ]
 
 
-avanceSemestral : Dict String (List MateriaCursada) -> Int -> List String -> AvanceDeMallaCurricular
-avanceSemestral materiasCursadas index materiasDelSemestre =
-    { etiqueta = indexToString (index + 1) ++ " Semestre"
-    , materias =
-        materiasDelSemestre
+getSemesterProgress : Dict String (List Attempt) -> Int -> List String -> SemesterProgress
+getSemesterProgress attemptsPerSubjectName index subjectsInSemester =
+    { semesterName = indexToString (index + 1) ++ " Semestre"
+    , semesterProgress =
+        subjectsInSemester
             |> List.map
                 (\materia ->
                     ( materia
-                    , materiasCursadas
+                    , attemptsPerSubjectName
                         |> Dict.get materia
                         |> Maybe.withDefault []
                     )
@@ -646,28 +646,28 @@ indexToString index =
             String.fromInt index ++ "°"
 
 
-organizarKardexPorNombre : List PeriodoCursado -> Dict String (List MateriaCursada)
+organizarKardexPorNombre : List Period -> Dict String (List Attempt)
 organizarKardexPorNombre kardex =
-    organizarMateriasCurzadasPorNombre
-        (kardex |> List.concatMap .materias)
+    getAttemptsPerSubjectName
+        (kardex |> List.concatMap .attempts)
         Dict.empty
 
 
-organizarMateriasCurzadasPorNombre : List MateriaCursada -> Dict String (List MateriaCursada) -> Dict String (List MateriaCursada)
-organizarMateriasCurzadasPorNombre materias acumulador =
-    case materias of
+getAttemptsPerSubjectName : List Attempt -> Dict String (List Attempt) -> Dict String (List Attempt)
+getAttemptsPerSubjectName remainingAttempts attemptsBySubjectName =
+    case remainingAttempts of
         [] ->
-            acumulador
+            attemptsBySubjectName
 
-        materia :: siguientesMaterias ->
-            case materia.asignatura of
-                Just nombreDeAsignatura ->
-                    addToDictList nombreDeAsignatura materia acumulador
-                        |> organizarMateriasCurzadasPorNombre siguientesMaterias
+        attempt :: nextAttempts ->
+            case attempt.subjectName of
+                Just subjectName ->
+                    addToDictList subjectName attempt attemptsBySubjectName
+                        |> getAttemptsPerSubjectName nextAttempts
 
                 Nothing ->
-                    acumulador
-                        |> organizarMateriasCurzadasPorNombre siguientesMaterias
+                    attemptsBySubjectName
+                        |> getAttemptsPerSubjectName nextAttempts
 
 
 addToDictList : comparable -> value -> Dict comparable (List value) -> Dict comparable (List value)
@@ -680,75 +680,75 @@ addToDictList key value dict =
             Dict.insert key [ value ] dict
 
 
-leerKardex : Result (List a) Html.Parser.Document -> List PeriodoCursado
-leerKardex docResult =
+readKardex : Result (List a) Html.Parser.Document -> List Period
+readKardex docResult =
     case docResult of
         Ok { document } ->
             document
                 |> Tuple.second
                 |> findByClassInNodeList "textoTablasKardex"
-                |> List.map leerPeriodo
+                |> List.map readPeriod
 
         Err _ ->
             []
 
 
-type alias MateriaCursada =
-    { asignatura : Maybe String
-    , calificacion : Maybe String
-    , situacion : Maybe String
-    , creditos : Maybe String
-    , tipoDeExamen : Maybe String
+type alias Attempt =
+    { subjectName : Maybe String
+    , grade : Maybe String
+    , situation : Maybe String
+    , credits : Maybe String
+    , examType : Maybe String
     }
 
 
-emptySubject : MateriaCursada
+emptySubject : Attempt
 emptySubject =
-    MateriaCursada Nothing Nothing Nothing Nothing Nothing
+    Attempt Nothing Nothing Nothing Nothing Nothing
 
 
-type alias PeriodoCursado =
-    { cicloEscolar : Maybe String
-    , materias : List MateriaCursada
+type alias Period =
+    { periodName : Maybe String
+    , attempts : List Attempt
     }
 
 
-leerPeriodo : Html.Parser.Node -> PeriodoCursado
-leerPeriodo node =
+readPeriod : Html.Parser.Node -> Period
+readPeriod node =
     case node of
         Html.Parser.Element _ _ ((Html.Parser.Element _ _ (titleNode :: nodesAfterTitle)) :: _) ->
-            { cicloEscolar = firstText titleNode
-            , materias = nodesToSubjects nodesAfterTitle
+            { periodName = firstText titleNode
+            , attempts = nodesToAttempts nodesAfterTitle
             }
 
         _ ->
-            PeriodoCursado Nothing []
+            Period Nothing []
 
 
-nodesToSubjects : List Html.Parser.Node -> List MateriaCursada
-nodesToSubjects nodesAfterTitle =
+nodesToAttempts : List Html.Parser.Node -> List Attempt
+nodesToAttempts nodesAfterTitle =
     case nodesAfterTitle of
-        (Html.Parser.Element _ _ ((Html.Parser.Element _ _ subjectNodes) :: _)) :: _ ->
-            subjectNodes
+        (Html.Parser.Element _ _ ((Html.Parser.Element _ _ attemptNodes) :: _)) :: _ ->
+            attemptNodes
                 |> findByElementInNodeList "tbody"
                 |> findByElementInNodeList "tr"
-                |> List.map tableRowToSubject
+                |> List.map tableRowToAttempt
 
         _ ->
             []
 
 
-tableRowToSubject : Html.Parser.Node -> MateriaCursada
-tableRowToSubject tableRow =
+tableRowToAttempt : Html.Parser.Node -> Attempt
+tableRowToAttempt tableRow =
     case tableRow of
         Html.Parser.Element _ _ tableCells ->
             case tableCells |> List.map firstText of
-                [ asignatura, calificacion, situacion, creditos, tipoDeExamen ] ->
-                    { asignatura = asignatura
-                    , calificacion = calificacion
-                    , situacion = situacion
-                    , creditos = creditos
-                    , tipoDeExamen = tipoDeExamen
+                [ subjectName, grade, situation, credits, examType ] ->
+                    { subjectName = subjectName
+                    , grade = grade
+                    , situation = situation
+                    , credits = credits
+                    , examType = examType
                     }
 
                 _ ->
