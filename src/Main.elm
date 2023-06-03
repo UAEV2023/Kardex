@@ -11,8 +11,8 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
+import Kardex
 import List.Extra
-import Maybe.Extra
 import Set
 import Task
 
@@ -24,7 +24,7 @@ import Task
 type alias Model =
     { hover : Bool
     , files : List File
-    , kardex : Maybe (List Period)
+    , kardex : Maybe (List Kardex.Period)
     , curriculum : Maybe Curriculum
     }
 
@@ -49,7 +49,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
-    | GotKardex (Maybe (List Period))
+    | GotKardex (Maybe (List Kardex.Period))
     | SelectCurriculum String
 
 
@@ -79,7 +79,7 @@ update msg model =
             , Task.perform GotKardex
                 (File.toString file
                     |> Task.map Html.Parser.runDocument
-                    |> Task.map readKardex
+                    |> Task.map Kardex.readKardex
                     |> Task.map Just
                 )
             )
@@ -195,7 +195,7 @@ view model =
             ( Just kardex, Just curriculum ) ->
                 let
                     attemptsBySubjectName =
-                        organizarKardexPorNombre kardex
+                        Kardex.organizarKardexPorNombre kardex
                 in
                 styled div
                     [ property "justify-self" "stretch" ]
@@ -249,7 +249,7 @@ showSemesterProgress { semesterName, semesterProgress } =
         ]
 
 
-showSubjectProgress : ( String, List Attempt ) -> Html msg
+showSubjectProgress : ( String, List Kardex.Attempt ) -> Html msg
 showSubjectProgress ( nombre, attempts ) =
     styled div
         [ property "display" "grid"
@@ -298,7 +298,7 @@ foo word n =
         word ++ "s"
 
 
-showLastSituation : List Attempt -> Html msg
+showLastSituation : List Kardex.Attempt -> Html msg
 showLastSituation attempts =
     case List.Extra.last attempts of
         Just { situation } ->
@@ -562,18 +562,18 @@ curriculums =
 
 type alias SemesterProgress =
     { semesterName : String
-    , semesterProgress : List ( String, List Attempt )
+    , semesterProgress : List ( String, List Kardex.Attempt )
     }
 
 
-getUnrecognizedSubjects : Curriculum -> Dict String (List Attempt) -> List ( String, List Attempt )
+getUnrecognizedSubjects : Curriculum -> Dict String (List Kardex.Attempt) -> List ( String, List Kardex.Attempt )
 getUnrecognizedSubjects { obligatorias, optativas, libres } materias =
     materias
         |> Dict.Extra.removeMany (Set.fromList (List.concat [ optativas, libres, List.concat obligatorias ]))
         |> Dict.toList
 
 
-getCurriculumProgress : Curriculum -> Dict String (List Attempt) -> List SemesterProgress
+getCurriculumProgress : Curriculum -> Dict String (List Kardex.Attempt) -> List SemesterProgress
 getCurriculumProgress { obligatorias, optativas, libres } totalAttempts =
     List.concat
         [ List.indexedMap (getSemesterProgress totalAttempts) obligatorias
@@ -593,7 +593,7 @@ getCurriculumProgress { obligatorias, optativas, libres } totalAttempts =
         ]
 
 
-getSemesterProgress : Dict String (List Attempt) -> Int -> List String -> SemesterProgress
+getSemesterProgress : Dict String (List Kardex.Attempt) -> Int -> List String -> SemesterProgress
 getSemesterProgress attemptsPerSubjectName index subjectsInSemester =
     { semesterName = indexToString (index + 1) ++ " Semestre"
     , semesterProgress =
@@ -644,191 +644,6 @@ indexToString index =
 
         _ ->
             String.fromInt index ++ "°"
-
-
-organizarKardexPorNombre : List Period -> Dict String (List Attempt)
-organizarKardexPorNombre kardex =
-    getAttemptsPerSubjectName
-        (kardex |> List.concatMap .attempts)
-        Dict.empty
-
-
-getAttemptsPerSubjectName : List Attempt -> Dict String (List Attempt) -> Dict String (List Attempt)
-getAttemptsPerSubjectName remainingAttempts attemptsBySubjectName =
-    case remainingAttempts of
-        [] ->
-            attemptsBySubjectName
-
-        attempt :: nextAttempts ->
-            case attempt.subjectName of
-                Just subjectName ->
-                    addToDictList subjectName attempt attemptsBySubjectName
-                        |> getAttemptsPerSubjectName nextAttempts
-
-                Nothing ->
-                    attemptsBySubjectName
-                        |> getAttemptsPerSubjectName nextAttempts
-
-
-addToDictList : comparable -> value -> Dict comparable (List value) -> Dict comparable (List value)
-addToDictList key value dict =
-    case Dict.get key dict of
-        Just previousKeys ->
-            Dict.insert key (previousKeys ++ [ value ]) dict
-
-        _ ->
-            Dict.insert key [ value ] dict
-
-
-readKardex : Result (List a) Html.Parser.Document -> List Period
-readKardex docResult =
-    case docResult of
-        Ok { document } ->
-            document
-                |> Tuple.second
-                |> findByClassInNodeList "textoTablasKardex"
-                |> List.map readPeriod
-
-        Err _ ->
-            []
-
-
-type alias Attempt =
-    { subjectName : Maybe String
-    , grade : Maybe String
-    , situation : Maybe String
-    , credits : Maybe String
-    , examType : Maybe String
-    }
-
-
-emptySubject : Attempt
-emptySubject =
-    Attempt Nothing Nothing Nothing Nothing Nothing
-
-
-type alias Period =
-    { periodName : Maybe String
-    , attempts : List Attempt
-    }
-
-
-readPeriod : Html.Parser.Node -> Period
-readPeriod node =
-    case node of
-        Html.Parser.Element _ _ ((Html.Parser.Element _ _ (titleNode :: nodesAfterTitle)) :: _) ->
-            { periodName = firstText titleNode
-            , attempts = nodesToAttempts nodesAfterTitle
-            }
-
-        _ ->
-            Period Nothing []
-
-
-nodesToAttempts : List Html.Parser.Node -> List Attempt
-nodesToAttempts nodesAfterTitle =
-    case nodesAfterTitle of
-        (Html.Parser.Element _ _ ((Html.Parser.Element _ _ attemptNodes) :: _)) :: _ ->
-            attemptNodes
-                |> findByElementInNodeList "tbody"
-                |> findByElementInNodeList "tr"
-                |> List.map tableRowToAttempt
-
-        _ ->
-            []
-
-
-tableRowToAttempt : Html.Parser.Node -> Attempt
-tableRowToAttempt tableRow =
-    case tableRow of
-        Html.Parser.Element _ _ tableCells ->
-            case tableCells |> List.map firstText of
-                [ subjectName, grade, situation, credits, examType ] ->
-                    { subjectName = subjectName
-                    , grade = grade
-                    , situation = situation
-                    , credits = credits
-                    , examType = examType
-                    }
-
-                _ ->
-                    emptySubject
-
-        _ ->
-            emptySubject
-
-
-firstText : Html.Parser.Node -> Maybe String
-firstText node =
-    case node of
-        Html.Parser.Text string ->
-            Just string
-
-        Html.Parser.Element _ _ nodes ->
-            nodes
-                |> List.map firstText
-                |> Maybe.Extra.orList
-
-        _ ->
-            Nothing
-
-
-findByClassInNodeList : String -> List Html.Parser.Node -> List Html.Parser.Node
-findByClassInNodeList class nodes =
-    case nodes of
-        [] ->
-            []
-
-        node :: nextNodes ->
-            findByClassInNode class node ++ findByClassInNodeList class nextNodes
-
-
-findByClassInNode : String -> Html.Parser.Node -> List Html.Parser.Node
-findByClassInNode class node =
-    case node of
-        Html.Parser.Element _ attributes nodes ->
-            if attributes |> List.any (hasClass class) then
-                [ node ]
-
-            else
-                findByClassInNodeList class nodes
-
-        _ ->
-            []
-
-
-findByElementInNodeList : String -> List Html.Parser.Node -> List Html.Parser.Node
-findByElementInNodeList element nodes =
-    case nodes of
-        [] ->
-            []
-
-        node :: nextNodes ->
-            findByElementInNode element node ++ findByElementInNodeList element nextNodes
-
-
-findByElementInNode : String -> Html.Parser.Node -> List Html.Parser.Node
-findByElementInNode elementToMatch node =
-    case node of
-        Html.Parser.Element element _ nodes ->
-            if elementToMatch == element then
-                [ node ]
-
-            else
-                findByElementInNodeList elementToMatch nodes
-
-        _ ->
-            []
-
-
-hasClass : String -> ( String, String ) -> Bool
-hasClass className attribute =
-    case attribute of
-        ( "class", classNames ) ->
-            classNames |> String.contains className
-
-        _ ->
-            False
 
 
 
