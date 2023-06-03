@@ -306,10 +306,7 @@ showLastSituation attempts =
                 [ backgroundColor (getSituationColor situation attempts)
                 ]
                 []
-                [ situation
-                    |> Maybe.withDefault "???"
-                    |> text
-                ]
+                [ text situation ]
 
         Nothing ->
             styled div
@@ -318,13 +315,13 @@ showLastSituation attempts =
                 [ text "Sin Intentos" ]
 
 
-getSituationColor : Maybe String -> List a -> Color
+getSituationColor : String -> List a -> Color
 getSituationColor situation attempts =
     case ( situation, List.length attempts ) of
-        ( Just "No Acreditado", 1 ) ->
+        ( "No Acreditado", 1 ) ->
             rgba 231 143 12 0.6
 
-        ( Just "No Acreditado", _ ) ->
+        ( "No Acreditado", _ ) ->
             rgba 231 12 12 0.6
 
         _ ->

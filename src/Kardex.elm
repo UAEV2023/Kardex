@@ -8,14 +8,15 @@ module Kardex exposing
 import Dict exposing (Dict)
 import Html.Parser
 import HtmlNodes
+import Maybe.Extra
 
 
 type alias Attempt =
-    { subjectName : Maybe String
-    , grade : Maybe String
-    , situation : Maybe String
-    , credits : Maybe String
-    , examType : Maybe String
+    { subjectName : String
+    , grade : String
+    , situation : String
+    , credits : String
+    , examType : String
     }
 
 
@@ -23,11 +24,6 @@ type alias Period =
     { periodName : Maybe String
     , attempts : List Attempt
     }
-
-
-emptySubject : Attempt
-emptySubject =
-    Attempt Nothing Nothing Nothing Nothing Nothing
 
 
 readKardex : Result (List a) Html.Parser.Document -> List Period
@@ -43,24 +39,25 @@ readKardex docResult =
             []
 
 
-tableRowToAttempt : Html.Parser.Node -> Attempt
+tableRowToAttempt : Html.Parser.Node -> Maybe Attempt
 tableRowToAttempt tableRow =
     case tableRow of
         Html.Parser.Element _ _ tableCells ->
-            case tableCells |> List.map HtmlNodes.firstText of
+            case tableCells |> List.map (HtmlNodes.firstText >> Maybe.withDefault "") of
                 [ subjectName, grade, situation, credits, examType ] ->
-                    { subjectName = subjectName
-                    , grade = grade
-                    , situation = situation
-                    , credits = credits
-                    , examType = examType
-                    }
+                    Just
+                        { subjectName = subjectName
+                        , grade = grade
+                        , situation = situation
+                        , credits = credits
+                        , examType = examType
+                        }
 
                 _ ->
-                    emptySubject
+                    Nothing
 
         _ ->
-            emptySubject
+            Nothing
 
 
 readPeriod : Html.Parser.Node -> Period
@@ -83,6 +80,7 @@ nodesToAttempts nodesAfterTitle =
                 |> HtmlNodes.findByElementInNodeList "tbody"
                 |> HtmlNodes.findByElementInNodeList "tr"
                 |> List.map tableRowToAttempt
+                |> Maybe.Extra.values
 
         _ ->
             []
@@ -102,14 +100,8 @@ getAttemptsPerSubjectName remainingAttempts attemptsBySubjectName =
             attemptsBySubjectName
 
         attempt :: nextAttempts ->
-            case attempt.subjectName of
-                Just subjectName ->
-                    addToDictList subjectName attempt attemptsBySubjectName
-                        |> getAttemptsPerSubjectName nextAttempts
-
-                Nothing ->
-                    attemptsBySubjectName
-                        |> getAttemptsPerSubjectName nextAttempts
+            addToDictList attempt.subjectName attempt attemptsBySubjectName
+                |> getAttemptsPerSubjectName nextAttempts
 
 
 addToDictList : comparable -> value -> Dict comparable (List value) -> Dict comparable (List value)
