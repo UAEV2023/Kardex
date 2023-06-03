@@ -326,15 +326,15 @@ getSituationColor situation attempts =
 
 
 type alias Curriculum =
-    { obligatorias : List (List String)
-    , optativas : List String
-    , libres : List String
+    { compulsorySubjects : List (List String)
+    , optionalSubjects : List String
+    , freeSubjects : List String
     }
 
 
 mallaCurricularIngSoftware : Curriculum
 mallaCurricularIngSoftware =
-    { obligatorias =
+    { compulsorySubjects =
         [ [ "Álgebra Intermedia"
           , "Geometría Analítica"
           , "Algoritmia"
@@ -381,7 +381,7 @@ mallaCurricularIngSoftware =
           ]
         , [ "Administración de Proyectos II" ]
         ]
-    , optativas =
+    , optionalSubjects =
         [ "AWS Academy Cloud Foundations"
         , "CCNA Redes empresariales, seguridad y automatización"
         , "Clean Architecture Principles"
@@ -390,7 +390,7 @@ mallaCurricularIngSoftware =
         , "Programación de robots móviles"
         , "Secure Programming"
         ]
-    , libres =
+    , freeSubjects =
         [ "Expresión, Actuación, Comunicación y Creación Escénica"
         , "Formación y Manejo de Equipos de Trabajo"
         , "Herramientas para la Comunicación Científica"
@@ -401,7 +401,7 @@ mallaCurricularIngSoftware =
 
 mallaCurricularBachilleratoEnLinea : Curriculum
 mallaCurricularBachilleratoEnLinea =
-    { obligatorias =
+    { compulsorySubjects =
         [ [ "Desarrollo del Lenguaje Algebraico"
           , "Estructura y Organización de la Naturaleza"
           , "Desarrollo del Pensamiento Científico"
@@ -448,7 +448,7 @@ mallaCurricularBachilleratoEnLinea =
           , "Formación ocupacional 6"
           ]
         ]
-    , optativas =
+    , optionalSubjects =
         -- Nivel 2
         [ "Promoción del Pensamiento Lógico Deductivo"
         , "Sexualidad Humana"
@@ -489,7 +489,7 @@ mallaCurricularBachilleratoEnLinea =
         , "Redacción de Poesía Contemporánea"
         , "Inglés Técnico"
         ]
-    , libres = []
+    , freeSubjects = []
     }
 
 
@@ -498,7 +498,7 @@ curriculums =
     [ ( "Licenciatura en Ingeniería de Software", mallaCurricularIngSoftware )
     , ( "Bachillerato en Línea", mallaCurricularBachilleratoEnLinea )
     , ( "Licenciatura en Literatura Latinoamericana"
-      , { obligatorias =
+      , { compulsorySubjects =
             [ [ "Literatura Española, Siglos XIII al XVI"
               , "Literatura de los Pueblos Originarios de América, Siglos XVI al XVIII"
               , "Semiótica Cultural"
@@ -547,8 +547,8 @@ curriculums =
               , "Prácticas Profesionales"
               ]
             ]
-        , optativas = []
-        , libres = []
+        , optionalSubjects = []
+        , freeSubjects = []
         }
       )
     ]
@@ -561,26 +561,26 @@ type alias SemesterProgress =
 
 
 getUnrecognizedSubjects : Curriculum -> Dict String (List Kardex.Attempt) -> List ( String, List Kardex.Attempt )
-getUnrecognizedSubjects { obligatorias, optativas, libres } materias =
+getUnrecognizedSubjects { compulsorySubjects, optionalSubjects, freeSubjects } materias =
     materias
-        |> Dict.Extra.removeMany (Set.fromList (List.concat [ optativas, libres, List.concat obligatorias ]))
+        |> Dict.Extra.removeMany (Set.fromList (List.concat [ optionalSubjects, freeSubjects, List.concat compulsorySubjects ]))
         |> Dict.toList
 
 
 getCurriculumProgress : Curriculum -> Dict String (List Kardex.Attempt) -> List SemesterProgress
-getCurriculumProgress { obligatorias, optativas, libres } totalAttempts =
+getCurriculumProgress { compulsorySubjects, optionalSubjects, freeSubjects } totalAttempts =
     List.concat
-        [ List.indexedMap (getSemesterProgress totalAttempts) obligatorias
+        [ List.indexedMap (getSemesterProgress totalAttempts) compulsorySubjects
         , [ { semesterName = "Optativas"
             , semesterProgress =
                 totalAttempts
-                    |> Dict.Extra.keepOnly (Set.fromList optativas)
+                    |> Dict.Extra.keepOnly (Set.fromList optionalSubjects)
                     |> Dict.toList
             }
           , { semesterName = "Libres"
             , semesterProgress =
                 totalAttempts
-                    |> Dict.Extra.keepOnly (Set.fromList libres)
+                    |> Dict.Extra.keepOnly (Set.fromList freeSubjects)
                     |> Dict.toList
             }
           ]
