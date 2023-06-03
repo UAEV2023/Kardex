@@ -1,7 +1,7 @@
 module Kardex exposing
     ( Attempt
     , Period
-    , organizarKardexPorNombre
+    , groupAttemptsBySubject
     , readKardex
     )
 
@@ -86,22 +86,15 @@ nodesToAttempts nodesAfterTitle =
             []
 
 
-organizarKardexPorNombre : List Period -> Dict String (List Attempt)
-organizarKardexPorNombre kardex =
-    getAttemptsPerSubjectName
-        (kardex |> List.concatMap .attempts)
-        Dict.empty
-
-
-getAttemptsPerSubjectName : List Attempt -> Dict String (List Attempt) -> Dict String (List Attempt)
-getAttemptsPerSubjectName remainingAttempts attemptsBySubjectName =
+groupAttemptsBySubject : Dict String (List Attempt) -> List Attempt -> Dict String (List Attempt)
+groupAttemptsBySubject attemptsBySubjectName remainingAttempts =
     case remainingAttempts of
         [] ->
             attemptsBySubjectName
 
         attempt :: nextAttempts ->
-            addToDictList attempt.subjectName attempt attemptsBySubjectName
-                |> getAttemptsPerSubjectName nextAttempts
+            nextAttempts
+                |> groupAttemptsBySubject (addToDictList attempt.subjectName attempt attemptsBySubjectName)
 
 
 addToDictList : comparable -> value -> Dict comparable (List value) -> Dict comparable (List value)

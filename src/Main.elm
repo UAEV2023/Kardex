@@ -24,7 +24,7 @@ import Task
 type alias Model =
     { hover : Bool
     , files : List File
-    , kardex : Maybe (List Kardex.Period)
+    , attemptsPerSubject : Maybe (Dict String (List Kardex.Attempt))
     , curriculum : Maybe Curriculum
     }
 
@@ -33,7 +33,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { hover = False
       , files = []
-      , kardex = Nothing
+      , attemptsPerSubject = Nothing
       , curriculum = Nothing
       }
     , Cmd.none
@@ -49,7 +49,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
-    | GotKardex (Maybe (List Kardex.Period))
+    | GotKardex (Dict String (List Kardex.Attempt))
     | SelectCurriculum String
 
 
@@ -80,12 +80,13 @@ update msg model =
                 (File.toString file
                     |> Task.map Html.Parser.runDocument
                     |> Task.map Kardex.readKardex
-                    |> Task.map Just
+                    |> Task.map (List.concatMap .attempts)
+                    |> Task.map (Kardex.groupAttemptsBySubject Dict.empty)
                 )
             )
 
         GotKardex content ->
-            ( { model | kardex = content }
+            ( { model | attemptsPerSubject = Just content }
             , Cmd.none
             )
 
@@ -191,17 +192,13 @@ view model =
                     :: (curriculums |> List.indexedMap curriculumToHtmlOption)
                 )
             ]
-        , case ( model.kardex, model.curriculum ) of
-            ( Just kardex, Just curriculum ) ->
-                let
-                    attemptsBySubjectName =
-                        Kardex.organizarKardexPorNombre kardex
-                in
+        , case ( model.attemptsPerSubject, model.curriculum ) of
+            ( Just attemptsPerSubject, Just curriculum ) ->
                 styled div
                     [ property "justify-self" "stretch" ]
                     []
                     (List.concat
-                        [ attemptsBySubjectName
+                        [ attemptsPerSubject
                             |> getCurriculumProgress curriculum
                             |> List.map showSemesterProgress
                         , [ styled div
@@ -217,7 +214,7 @@ view model =
                                     , property "align-items" "start"
                                     ]
                                     []
-                                    (attemptsBySubjectName
+                                    (attemptsPerSubject
                                         |> getUnrecognizedSubjects curriculum
                                         |> List.map showSubjectProgress
                                     )
