@@ -7,6 +7,10 @@ Esta es una pequeña descripción de los términos del mundo real que serán pla
 | Malla curricular | Curriculum | Lista de materias, organizadas por niveles, necesarias para acreditar un plan de estudios. Las materias se dividen entre obligatorias, optativas y ocupacionales. Todas las materias obligatorias se deben cumplir, para las optativas y ocupacionales se deben de cumplir cierta cantidad de las disponibles por nivel. |
 | Nivel | Semester |  |
 | Materia | Subject |  |
+| Materia obligatoria | Compulsory subject |  |
+| Materia optativa | Optional subject |  |
+| Materia libre | Free subject |  |
+| Materia ocupacional | Occupational subject |  |
 | Periodo escolar | Period | Rango de fechas en las que se puede cursar una materia. |
 | Intento | Attempt | Ocasión en la que un alumno cursó una materia. Cada intento incluye una calificación final y situación. |
 | Situación | situation | Resultado de cursar una materia. Puede ser _No Acreditado_, _Suficiente_, _Satisfactorio_ o _Sobresaliente_ |
