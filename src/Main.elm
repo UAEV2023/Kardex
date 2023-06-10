@@ -81,7 +81,7 @@ update msg model =
                     |> Task.map Html.Parser.runDocument
                     |> Task.map Kardex.readKardex
                     |> Task.map (List.concatMap .attempts)
-                    |> Task.map (Kardex.groupAttemptsBySubject Dict.empty)
+                    |> Task.map (Kardex.groupAttemptsBySubject aliases Dict.empty)
                 )
             )
 
@@ -513,6 +513,28 @@ mallaCurricularBachilleratoEnLinea =
         , "Formación Ocupacional 6: Análisis e Interpretación de Estados Financieros"
         ]
     }
+
+
+aliases : Dict String (List String)
+aliases =
+    Dict.fromList
+        [ ( "Diseño Gráfico", [ "Formación Ocupacional 1: Diseño Gráfico" ] )
+        , ( "Introducción a la Administración", [ "Formación Ocupacional 1: Introducción a la Administración" ] )
+        , ( "Formación", [ "Formación Ocupacional 2: Formación" ] )
+        , ( "Planeación Estratégica", [ "Formación Ocupacional 2: Planeación Estratégica" ] )
+        , ( "Fundamentos de Mercadotecnia", [ "Formación Ocupacional 2: Fundamentos de Mercadotecnia" ] )
+        , ( "Diseño WEB", [ "Formación Ocupacional 3: Diseño WEB" ] )
+        , ( "Fundamentos de Contabilidad", [ "Formación Ocupacional 3: Fundamentos de Contabilidad" ] )
+        , ( "Administrador de Medios Sociales 1", [ "Formación Ocupacional 3: Administrador de Medios Sociales 1" ] )
+        , ( "Redes y Comunicaciones", [ "Formación Ocupacional 4: Redes y Comunicaciones" ] )
+        , ( "Administración de Recursos Humanos", [ "Formación Ocupacional 4: Administración de Recursos Humanos" ] )
+        , ( "Administrador de Medios Sociales 2", [ "Formación Ocupacional 4: Administrador de Medios Sociales 2" ] )
+        , ( "Bases de Datos", [ "Formación Ocupacional 5: Bases de Datos" ] )
+        , ( "Fundamentos de Mercadotecnia", [ "Formación Ocupacional 5: Fundamentos de Mercadotecnia" ] )
+        , ( "Administrador de Comunidades Virtuales 1", [ "Formación Ocupacional 5: Administrador de Comunidades Virtuales 1" ] )
+        , ( "Programación WEB", [ "Formación Ocupacional 6: Programación WEB" ] )
+        , ( "Análisis e Interpretación de Estados Financieros", [ "Formación Ocupacional 6: Análisis e Interpretación de Estados Financieros" ] )
+        ]
 
 
 curriculums : List ( String, Curriculum )

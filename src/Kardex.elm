@@ -6,6 +6,7 @@ module Kardex exposing
     )
 
 import Dict exposing (Dict)
+import Dict.Extra
 import Html.Parser
 import HtmlNodes
 import Maybe.Extra
@@ -86,15 +87,31 @@ nodesToAttempts nodesAfterTitle =
             []
 
 
-groupAttemptsBySubject : Dict String (List Attempt) -> List Attempt -> Dict String (List Attempt)
-groupAttemptsBySubject attemptsBySubjectName remainingAttempts =
+groupAttemptsBySubject : Dict String (List String) -> Dict String (List Attempt) -> List Attempt -> Dict String (List Attempt)
+groupAttemptsBySubject aliases attemptsBySubjectName remainingAttempts =
     case remainingAttempts of
         [] ->
             attemptsBySubjectName
 
         attempt :: nextAttempts ->
-            nextAttempts
-                |> groupAttemptsBySubject (addToDictList attempt.subjectName attempt attemptsBySubjectName)
+            let
+                correctAttempt =
+                    updateAttemptsWithAlias aliases attempt
+            in
+            groupAttemptsBySubject
+                aliases
+                (addToDictList correctAttempt.subjectName correctAttempt attemptsBySubjectName)
+                nextAttempts
+
+
+updateAttemptsWithAlias : Dict String (List String) -> Attempt -> Attempt
+updateAttemptsWithAlias aliases attempt =
+    case Dict.Extra.find (\_ -> List.member attempt.subjectName) aliases of
+        Just ( correctSubjectName, _ ) ->
+            { attempt | subjectName = correctSubjectName }
+
+        Nothing ->
+            attempt
 
 
 addToDictList : comparable -> value -> Dict comparable (List value) -> Dict comparable (List value)
