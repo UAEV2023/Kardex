@@ -409,7 +409,6 @@ mallaCurricularBachilleratoEnLinea =
           , "Comprensión Lectora y Organización de la Información"
           , "Beginner 1"
           , "Desarrollo del Individuo"
-          , "Formación ocupacional 1"
           ]
         , [ "Solución de Problemas con Ecuaciones"
           , "Dinámica de la Naturaleza"
@@ -417,7 +416,6 @@ mallaCurricularBachilleratoEnLinea =
           , "Desarrollo de la Argumentación"
           , "Beginner 2"
           , "Responsabilidad Social"
-          , "Formación ocupacional 2"
           ]
         , [ "Trigonometría y Geometría"
           , "Seres Vivos: Adaptación a su Ambiente"
@@ -425,27 +423,23 @@ mallaCurricularBachilleratoEnLinea =
           , "El Derecho en la Vida Ciudadana"
           , "Elaboración de Escritos Académicos"
           , "Elementary 1"
-          , "Formación ocupacional 3"
           ]
         , [ "Desigualdades y Funciones Algebraicas"
           , "Bioenergética"
           , "Problemas Éticos y Morales"
           , "Análisis e Interpretación Literaria 1"
           , "Elementary 2"
-          , "Formación ocupacional 4"
           ]
         , [ "Funciones y Series Matemáticas"
           , "Sistemas Biológicos y Ambientales"
           , "De la Independencia a la Globalización en México y Yucatán"
           , "Pre-Intermediate"
           , "Mi Filosofía de Vida"
-          , "Formación ocupacional 5"
           ]
         , [ "La Estadística y La Vida"
           , "Diagnóstico e Intervención Ambiental"
           , "Administración y Liderazgo Emprendedor"
           , "Trascendencia Social"
-          , "Formación ocupacional 6"
           ]
         ]
     , optionalSubjects =
@@ -489,7 +483,35 @@ mallaCurricularBachilleratoEnLinea =
         , "Redacción de Poesía Contemporánea"
         , "Inglés Técnico"
         ]
-    , occupationalSubjects = []
+    , occupationalSubjects =
+        -- Nivel 1
+        [ "Formación Ocupacional 1: Diseño Gráfico"
+        , "Formación Ocupacional 1: Introducción a la Administración"
+
+        -- Nivel 2
+        , "Formación Ocupacional 2: Formación"
+        , "Formación Ocupacional 2: Planeación Estratégica"
+        , "Formación Ocupacional 2: Fundamentos de Mercadotecnia"
+
+        -- Nivel 3
+        , "Formación Ocupacional 3: Diseño WEB"
+        , "Formación Ocupacional 3: Fundamentos de Contabilidad"
+        , "Formación Ocupacional 3: Administrador de Medios Sociales 1"
+
+        -- Nivel 4
+        , "Formación Ocupacional 4: Redes y Comunicaciones"
+        , "Formación Ocupacional 4: Administración de Recursos Humanos"
+        , "Formación Ocupacional 4: Administrador de Medios Sociales 2"
+
+        -- Nivel 5
+        , "Formación Ocupacional 5: Bases de Datos"
+        , "Formación Ocupacional 5: Fundamentos de Mercadotecnia"
+        , "Formación Ocupacional 5: Administrador de Comunidades Virtuales 1"
+
+        -- Nivel 6
+        , "Formación Ocupacional 6: Programación WEB"
+        , "Formación Ocupacional 6: Análisis e Interpretación de Estados Financieros"
+        ]
     }
 
 
