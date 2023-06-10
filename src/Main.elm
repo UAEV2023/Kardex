@@ -603,43 +603,6 @@ getSemesterProgress attemptsPerSubjectName index subjectsInSemester =
     }
 
 
-indexToString : Int -> String
-indexToString index =
-    case index of
-        1 ->
-            "Primer"
-
-        2 ->
-            "Segundo"
-
-        3 ->
-            "Tercer"
-
-        4 ->
-            "Cuarto"
-
-        5 ->
-            "Quinto"
-
-        6 ->
-            "Sexto"
-
-        7 ->
-            "Séptimo"
-
-        8 ->
-            "Octavo"
-
-        9 ->
-            "Noveno"
-
-        10 ->
-            "Décimo"
-
-        _ ->
-            String.fromInt index ++ "°"
-
-
 
 ---- PROGRAM ----
 
