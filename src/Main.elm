@@ -328,7 +328,7 @@ getSituationColor situation attempts =
 type alias Curriculum =
     { compulsorySubjects : List (List String)
     , optionalSubjects : List String
-    , freeSubjects : List String
+    , occupationalSubjects : List String
     }
 
 
@@ -390,7 +390,7 @@ mallaCurricularIngSoftware =
         , "Programación de robots móviles"
         , "Secure Programming"
         ]
-    , freeSubjects =
+    , occupationalSubjects =
         [ "Expresión, Actuación, Comunicación y Creación Escénica"
         , "Formación y Manejo de Equipos de Trabajo"
         , "Herramientas para la Comunicación Científica"
@@ -489,7 +489,7 @@ mallaCurricularBachilleratoEnLinea =
         , "Redacción de Poesía Contemporánea"
         , "Inglés Técnico"
         ]
-    , freeSubjects = []
+    , occupationalSubjects = []
     }
 
 
@@ -548,7 +548,7 @@ curriculums =
               ]
             ]
         , optionalSubjects = []
-        , freeSubjects = []
+        , occupationalSubjects = []
         }
       )
     ]
@@ -561,14 +561,14 @@ type alias SemesterProgress =
 
 
 getUnrecognizedSubjects : Curriculum -> Dict String (List Kardex.Attempt) -> List ( String, List Kardex.Attempt )
-getUnrecognizedSubjects { compulsorySubjects, optionalSubjects, freeSubjects } materias =
+getUnrecognizedSubjects { compulsorySubjects, optionalSubjects, occupationalSubjects } materias =
     materias
-        |> Dict.Extra.removeMany (Set.fromList (List.concat [ optionalSubjects, freeSubjects, List.concat compulsorySubjects ]))
+        |> Dict.Extra.removeMany (Set.fromList (List.concat [ optionalSubjects, occupationalSubjects, List.concat compulsorySubjects ]))
         |> Dict.toList
 
 
 getCurriculumProgress : Curriculum -> Dict String (List Kardex.Attempt) -> List SemesterProgress
-getCurriculumProgress { compulsorySubjects, optionalSubjects, freeSubjects } totalAttempts =
+getCurriculumProgress { compulsorySubjects, optionalSubjects, occupationalSubjects } totalAttempts =
     List.concat
         [ List.indexedMap (getSemesterProgress totalAttempts) compulsorySubjects
         , [ { semesterName = "Optativas"
@@ -577,10 +577,10 @@ getCurriculumProgress { compulsorySubjects, optionalSubjects, freeSubjects } tot
                     |> Dict.Extra.keepOnly (Set.fromList optionalSubjects)
                     |> Dict.toList
             }
-          , { semesterName = "Libres"
+          , { semesterName = "Ocupacionales"
             , semesterProgress =
                 totalAttempts
-                    |> Dict.Extra.keepOnly (Set.fromList freeSubjects)
+                    |> Dict.Extra.keepOnly (Set.fromList occupationalSubjects)
                     |> Dict.toList
             }
           ]
@@ -589,7 +589,7 @@ getCurriculumProgress { compulsorySubjects, optionalSubjects, freeSubjects } tot
 
 getSemesterProgress : Dict String (List Kardex.Attempt) -> Int -> List String -> SemesterProgress
 getSemesterProgress attemptsPerSubjectName index subjectsInSemester =
-    { semesterName = indexToString (index + 1) ++ " Semestre"
+    { semesterName = "Nivel " ++ String.fromInt (index + 1)
     , semesterProgress =
         subjectsInSemester
             |> List.map
