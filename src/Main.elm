@@ -621,7 +621,7 @@ getCurriculumProgress { compulsorySubjects, optionalSubjects, occupationalSubjec
                     |> Dict.Extra.keepOnly (Set.fromList optionalSubjects)
                     |> Dict.toList
             }
-          , { semesterName = "Ocupacionales"
+          , { semesterName = "Formación ocupacional"
             , semesterProgress =
                 totalAttempts
                     |> Dict.Extra.keepOnly (Set.fromList occupationalSubjects)
