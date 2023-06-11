@@ -16,3 +16,4 @@ Esta es una pequeña descripción de los términos del mundo real que serán pla
 | Situación | situation | Resultado de cursar una materia. Puede ser _No Acreditado_, _Suficiente_, _Satisfactorio_ o _Sobresaliente_ |
 | Kardex | Kardex | Historial de intentos de un alumno, organizado por periodos. |
 | Avance de malla curricular | Curriculum progress | Historial de intentos de un alumno, organizados por niveles. También incluye las materias obligatorias sin intentos. |
+| Alias | Alias | Nombres alternos que puede tener una materia. Por ejemplo, un alias de _Diseño Gráfico_ es _Formación Ocupacional 1: Diseño Gráfico_. Si en el Kardex se usa un alias, en el avance de la malla curricular se reemplazará por el nombre "original" de la materia. |
