@@ -14,6 +14,6 @@ Esta es una pequeña descripción de los términos del mundo real que serán pla
 | Periodo escolar | Period | Rango de fechas en las que se puede cursar una materia. |
 | Intento | Attempt | Ocasión en la que un alumno cursó una materia. Cada intento incluye una calificación final y situación. |
 | Situación | situation | Resultado de cursar una materia. Puede ser _No Acreditado_, _Suficiente_, _Satisfactorio_ o _Sobresaliente_ |
-| Kardex | Kardex | Historial de intentos de un alumno, organizado por periodos. |
+| Kardex | Kardex | Documento que muestra el avance académico de un alumno. Incluye nombre del alumno y su tutor, el historial de períodos cursados y estadísticas como créditos aprobados, porcentaje de avance, promedio, etc. |
 | Avance de malla curricular | Curriculum progress | Historial de intentos de un alumno, organizados por niveles. También incluye las materias obligatorias sin intentos. |
 | Alias | Alias | Nombres alternos que puede tener una materia. Por ejemplo, un alias de _Diseño Gráfico_ es _Formación Ocupacional 1: Diseño Gráfico_. Si en el Kardex se usa un alias, en el avance de la malla curricular se reemplazará por el nombre "original" de la materia. |

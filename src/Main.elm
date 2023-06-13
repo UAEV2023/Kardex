@@ -11,7 +11,7 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
-import Kardex
+import Kardex exposing (Kardex)
 import List.Extra
 import Set
 import Task
@@ -24,7 +24,7 @@ import Task
 type alias Model =
     { hover : Bool
     , files : List File
-    , kardex : Maybe (List Kardex.Period)
+    , periods : Maybe (List Kardex.Period)
     , studentName : Maybe String
     , tutorName : Maybe String
     , curriculum : Maybe Curriculum
@@ -38,7 +38,7 @@ init =
       , curriculum = Nothing
       , studentName = Nothing
       , tutorName = Nothing
-      , kardex = Nothing
+      , periods = Nothing
       }
     , Cmd.none
     )
@@ -53,7 +53,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
-    | GotKardex Kardex.ParsedHtmlKardex
+    | GotKardex Kardex
     | SelectCurriculum String
 
 
@@ -83,13 +83,13 @@ update msg model =
             , Task.perform GotKardex
                 (File.toString file
                     |> Task.map Html.Parser.runDocument
-                    |> Task.map Kardex.readKardex
+                    |> Task.map Kardex.fromHtmlDocument
                 )
             )
 
-        GotKardex { kardex, studentName, tutorName } ->
+        GotKardex { periods, studentName, tutorName } ->
             ( { model
-                | kardex = Just kardex
+                | periods = Just periods
                 , studentName = Debug.log "Student name" studentName
                 , tutorName = Debug.log "Tutor name" tutorName
               }
@@ -198,11 +198,11 @@ view model =
                     :: (curriculums |> List.indexedMap curriculumToHtmlOption)
                 )
             ]
-        , case ( model.kardex, model.curriculum ) of
-            ( Just kardex, Just curriculum ) ->
+        , case ( model.periods, model.curriculum ) of
+            ( Just periods, Just curriculum ) ->
                 let
                     attemptsPerSubject =
-                        kardex
+                        periods
                             |> List.concatMap .attempts
                             |> Kardex.groupAttemptsBySubject aliases Dict.empty
                 in

@@ -1,9 +1,9 @@
 module Kardex exposing
     ( Attempt
-    , ParsedHtmlKardex
+    , Kardex
     , Period
+    , fromHtmlDocument
     , groupAttemptsBySubject
-    , readKardex
     )
 
 import Dict exposing (Dict)
@@ -29,15 +29,15 @@ type alias Period =
     }
 
 
-type alias ParsedHtmlKardex =
+type alias Kardex =
     { studentName : Maybe String
     , tutorName : Maybe String
-    , kardex : List Period
+    , periods : List Period
     }
 
 
-readKardex : Result (List a) Html.Parser.Document -> ParsedHtmlKardex
-readKardex docResult =
+fromHtmlDocument : Result (List a) Html.Parser.Document -> Kardex
+fromHtmlDocument docResult =
     case docResult of
         Ok { document } ->
             let
@@ -47,7 +47,7 @@ readKardex docResult =
                         |> HtmlNodes.findByClassInNodeList "icePnlTbSetCnt"
                         |> HtmlNodes.findByClassInNodeList "icePnlGrp"
             in
-            { kardex =
+            { periods =
                 document
                     |> Tuple.second
                     |> HtmlNodes.findByClassInNodeList "textoTablasKardex"
@@ -63,7 +63,7 @@ readKardex docResult =
             }
 
         Err _ ->
-            { studentName = Nothing, tutorName = Nothing, kardex = [] }
+            { studentName = Nothing, tutorName = Nothing, periods = [] }
 
 
 tableRowToAttempt : Html.Parser.Node -> Maybe Attempt
