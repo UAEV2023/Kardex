@@ -24,7 +24,7 @@ import Task
 type alias Model =
     { hover : Bool
     , files : List File
-    , attemptsPerSubject : Maybe (Dict String (List Kardex.Attempt))
+    , kardex : Maybe (List Kardex.Period)
     , curriculum : Maybe Curriculum
     }
 
@@ -33,8 +33,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { hover = False
       , files = []
-      , attemptsPerSubject = Nothing
       , curriculum = Nothing
+      , kardex = Nothing
       }
     , Cmd.none
     )
@@ -49,7 +49,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
-    | GotKardex (Dict String (List Kardex.Attempt))
+    | GotKardex Kardex.ParsedHtmlKardex
     | SelectCurriculum String
 
 
@@ -80,13 +80,11 @@ update msg model =
                 (File.toString file
                     |> Task.map Html.Parser.runDocument
                     |> Task.map Kardex.readKardex
-                    |> Task.map (List.concatMap .attempts)
-                    |> Task.map (Kardex.groupAttemptsBySubject aliases Dict.empty)
                 )
             )
 
-        GotKardex content ->
-            ( { model | attemptsPerSubject = Just content }
+        GotKardex kardex ->
+            ( { model | kardex = Just kardex }
             , Cmd.none
             )
 
@@ -192,8 +190,14 @@ view model =
                     :: (curriculums |> List.indexedMap curriculumToHtmlOption)
                 )
             ]
-        , case ( model.attemptsPerSubject, model.curriculum ) of
-            ( Just attemptsPerSubject, Just curriculum ) ->
+        , case ( model.kardex, model.curriculum ) of
+            ( Just kardex, Just curriculum ) ->
+                let
+                    attemptsPerSubject =
+                        kardex
+                            |> List.concatMap .attempts
+                            |> Kardex.groupAttemptsBySubject aliases Dict.empty
+                in
                 styled div
                     [ property "justify-self" "stretch" ]
                     []
