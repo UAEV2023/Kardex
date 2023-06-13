@@ -1,5 +1,6 @@
 module Kardex exposing
     ( Attempt
+    , ParsedHtmlKardex
     , Period
     , groupAttemptsBySubject
     , readKardex
@@ -9,6 +10,7 @@ import Dict exposing (Dict)
 import Dict.Extra
 import Html.Parser
 import HtmlNodes
+import List.Extra
 import Maybe.Extra
 
 
@@ -27,17 +29,41 @@ type alias Period =
     }
 
 
-readKardex : Result (List a) Html.Parser.Document -> List Period
+type alias ParsedHtmlKardex =
+    { studentName : Maybe String
+    , tutorName : Maybe String
+    , kardex : List Period
+    }
+
+
+readKardex : Result (List a) Html.Parser.Document -> ParsedHtmlKardex
 readKardex docResult =
     case docResult of
         Ok { document } ->
-            document
-                |> Tuple.second
-                |> HtmlNodes.findByClassInNodeList "textoTablasKardex"
-                |> List.map readPeriod
+            let
+                studentAndTutorNodes =
+                    document
+                        |> Tuple.second
+                        |> HtmlNodes.findByClassInNodeList "icePnlTbSetCnt"
+                        |> HtmlNodes.findByClassInNodeList "icePnlGrp"
+            in
+            { kardex =
+                document
+                    |> Tuple.second
+                    |> HtmlNodes.findByClassInNodeList "textoTablasKardex"
+                    |> List.map readPeriod
+            , studentName =
+                studentAndTutorNodes
+                    |> List.Extra.getAt 0
+                    |> Maybe.map (HtmlNodes.firstText >> Maybe.withDefault "")
+            , tutorName =
+                studentAndTutorNodes
+                    |> List.Extra.getAt 1
+                    |> Maybe.map (HtmlNodes.firstText >> Maybe.withDefault "")
+            }
 
         Err _ ->
-            []
+            { studentName = Nothing, tutorName = Nothing, kardex = [] }
 
 
 tableRowToAttempt : Html.Parser.Node -> Maybe Attempt

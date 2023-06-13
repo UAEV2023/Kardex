@@ -25,6 +25,8 @@ type alias Model =
     { hover : Bool
     , files : List File
     , kardex : Maybe (List Kardex.Period)
+    , studentName : Maybe String
+    , tutorName : Maybe String
     , curriculum : Maybe Curriculum
     }
 
@@ -34,6 +36,8 @@ init =
     ( { hover = False
       , files = []
       , curriculum = Nothing
+      , studentName = Nothing
+      , tutorName = Nothing
       , kardex = Nothing
       }
     , Cmd.none
@@ -83,8 +87,12 @@ update msg model =
                 )
             )
 
-        GotKardex kardex ->
-            ( { model | kardex = Just kardex }
+        GotKardex { kardex, studentName, tutorName } ->
+            ( { model
+                | kardex = Just kardex
+                , studentName = Debug.log "Student name" studentName
+                , tutorName = Debug.log "Tutor name" tutorName
+              }
             , Cmd.none
             )
 
