@@ -15,6 +15,7 @@ import Kardex exposing (Kardex)
 import List.Extra
 import Set
 import Task
+import UI.Media
 
 
 
@@ -159,6 +160,7 @@ view model =
             , borderRadius (rem 1)
             , width (pct 80)
             , height (rem 8)
+            , UI.Media.onPrint [ display none ]
             ]
             [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
             , hijackOn "dragover" (Decode.succeed DragEnter)
@@ -179,6 +181,7 @@ view model =
             , property "grid-template-columns" "auto auto"
             , property "align-items" "center"
             , property "grid-gap" "0.5rem"
+            , UI.Media.onPrint [ display none ]
             ]
             []
             [ label [ Attributes.for "malla-curricular" ] [ text "Seleccionar malla curricular:" ]
