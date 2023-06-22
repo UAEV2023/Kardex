@@ -91,8 +91,8 @@ update msg model =
         GotKardex { periods, studentName, tutorName } ->
             ( { model
                 | periods = Just periods
-                , studentName = Debug.log "Student name" studentName
-                , tutorName = Debug.log "Tutor name" tutorName
+                , studentName = studentName
+                , tutorName = tutorName
               }
             , Cmd.none
             )
