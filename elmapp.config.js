@@ -1,3 +1,3 @@
 module.exports = {
-    homepage: "https://Chesare22.github.io/Kardex"
+    homepage: "https://UAEV2023.github.io/Kardex"
 }
