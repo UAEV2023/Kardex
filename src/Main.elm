@@ -138,6 +138,13 @@ curriculumToHtmlOption index ( nombre, _ ) =
         [ text nombre ]
 
 
+
+{- Overlay spec and implementation:
+   https://m2.material.io/design/interaction/states.html#anatomy
+   https://stackoverflow.com/a/44616196/13194448
+-}
+
+
 baseOverlay : Style
 baseOverlay =
     batch
@@ -161,6 +168,13 @@ overlayOnColoredSurface =
         , focus [ opacity (num 0.24) ]
         , active [ opacity (num 0.32) ]
         ]
+
+
+
+{- Button spec:
+   https://m2.material.io/components/buttons
+   https://m2.material.io/design/typography/the-type-system.html#type-scale
+-}
 
 
 baseButton : Style
