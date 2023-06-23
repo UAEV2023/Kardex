@@ -225,17 +225,24 @@ view model =
         ]
         []
         [ styled div
-            [ border3 (px 2)
+            [ property "display" "grid"
+            , property "align-items" "center"
+            , property "grid-template-columns" "auto auto"
+            , property "grid-column-gap" "0.5rem"
+            , property "grid-row-gap" "1rem"
+            , property "justify-content" "center"
+            , border3
+                (px 2)
                 dashed
                 (if model.hover then
                     rgb 23 166 226
 
                  else
-                    rgb 11 14 17
+                    hex "#002E5F"
                 )
             , borderRadius (rem 1)
-            , width (pct 80)
-            , height (rem 8)
+            , width (pct 100)
+            , padding (rem 2)
             , UI.Media.onPrint [ display none ]
             ]
             [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
@@ -244,14 +251,41 @@ view model =
             , on "dragleave" (Decode.succeed DragLeave)
             ]
             [ styled button
-                [ containedButton ]
+                [ containedButton
+                , property "justify-self" "end"
+                ]
                 [ onClick Pick ]
-                [ text "Subir Kardex" ]
-            , text
-                (model.files
-                    |> List.map File.name
-                    |> String.join ", "
-                )
+                [ text "Haga click aquí" ]
+            , styled span
+                [ fontWeight (int 500)
+                , property "justify-self" "start"
+                ]
+                []
+                [ text "o arrastre el archivo en esta área para seleccionarlo"
+                ]
+
+            -- Divider
+            , styled div
+                [ property "grid-column-start" "span 2"
+                , property "justify-self" "center"
+                , border3 (px 1) solid (hex "#001F45")
+                , borderRadius (px 5)
+                , width (pct 80)
+                ]
+                []
+                []
+            , styled span
+                [ fontStyle italic
+                , property "grid-column-start" "span 2"
+                , property "justify-self" "center"
+                ]
+                []
+                [ text
+                    (List.head model.files
+                        |> Maybe.map File.name
+                        |> Maybe.withDefault "Ningún archivo seleccionado"
+                    )
+                ]
             ]
         , styled div
             [ property "display" "grid"
