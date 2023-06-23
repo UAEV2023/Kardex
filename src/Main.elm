@@ -63,7 +63,7 @@ update msg model =
     case msg of
         Pick ->
             ( model
-            , Select.files [ "*" ] GotFiles
+            , Select.files [ ".html" ] GotFiles
             )
 
         DragEnter ->
