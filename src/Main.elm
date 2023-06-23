@@ -8,7 +8,6 @@ import File exposing (File)
 import File.Select as Select
 import Html.Parser
 import Html.Styled exposing (..)
-import Html.Styled.Attributes as Attributes
 import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
 import Kardex exposing (Kardex)
@@ -36,7 +35,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { hover = False
       , files = []
-      , curriculum = Nothing
+      , curriculum = Just mallaCurricularBachilleratoEnLinea
       , studentName = Nothing
       , tutorName = Nothing
       , periods = Nothing
@@ -129,13 +128,6 @@ alwaysPreventDefault msg =
 hijackOn : String -> Decode.Decoder msg -> Attribute msg
 hijackOn event decoder =
     custom event (Decode.map alwaysPreventDefault decoder)
-
-
-curriculumToHtmlOption : Int -> ( String, a ) -> Html msg
-curriculumToHtmlOption index ( nombre, _ ) =
-    option
-        [ Attributes.value (String.fromInt index) ]
-        [ text nombre ]
 
 
 
@@ -286,31 +278,6 @@ view model =
                         |> Maybe.withDefault "Ningún archivo seleccionado"
                     )
                 ]
-            ]
-        , styled div
-            [ property "display" "grid"
-            , property "grid-template-columns" "auto auto"
-            , property "align-items" "center"
-            , property "grid-gap" "0.5rem"
-            , UI.Media.onPrint [ display none ]
-            ]
-            []
-            [ label [ Attributes.for "malla-curricular" ] [ text "Seleccionar malla curricular:" ]
-            , styled select
-                [ width (rem 20)
-                , padding2 (rem 0.25) (rem 0.5)
-                ]
-                [ Attributes.id "malla-curricular"
-                , onInput SelectCurriculum
-                ]
-                (option
-                    [ Attributes.disabled True
-                    , Attributes.selected True
-                    , Attributes.value ""
-                    ]
-                    []
-                    :: (curriculums |> List.indexedMap curriculumToHtmlOption)
-                )
             ]
         , case ( model.periods, model.curriculum ) of
             ( Just periods, Just curriculum ) ->
