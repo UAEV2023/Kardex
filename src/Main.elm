@@ -138,6 +138,68 @@ curriculumToHtmlOption index ( nombre, _ ) =
         [ text nombre ]
 
 
+baseOverlay : Style
+baseOverlay =
+    batch
+        [ position absolute
+        , padding (px 0)
+        , top (px 0)
+        , left (px 0)
+        , width (pct 100)
+        , height (pct 100)
+        , overflow hidden
+        , backgroundColor currentColor
+        ]
+
+
+overlayOnColoredSurface : Style
+overlayOnColoredSurface =
+    batch
+        [ baseOverlay
+        , opacity (num 0)
+        , hover [ opacity (num 0.08) ]
+        , focus [ opacity (num 0.24) ]
+        , active [ opacity (num 0.32) ]
+        ]
+
+
+baseButton : Style
+baseButton =
+    batch
+        [ position relative
+        , fontSize (px 14)
+        , fontWeight (int 500)
+        , letterSpacing (px 1.25)
+        , fontFamilies [ "Roboto", "sans-serif" ]
+        , textTransform uppercase
+        , cursor pointer
+        ]
+
+
+containedButton : Style
+containedButton =
+    batch
+        [ baseButton
+        , backgroundColor (hex "#004479")
+        , color (hex "#FFFFFF")
+        , paddingLeft (rem 1)
+        , paddingRight (rem 1)
+        , height (rem 2.25)
+        , minWidth (rem 4)
+        , borderRadius (px 4)
+        , border (px 0)
+        , outline none
+        , property "transition-duration" "0.28s"
+        , property "box-shadow" "0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)"
+        , hover [ property "box-shadow" "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)" ]
+        , focus [ property "box-shadow" "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)" ]
+        , after
+            [ property "content" "\"\""
+            , overlayOnColoredSurface
+            ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
     styled div
@@ -167,7 +229,8 @@ view model =
             , on "dragenter" (Decode.succeed DragEnter)
             , on "dragleave" (Decode.succeed DragLeave)
             ]
-            [ button
+            [ styled button
+                [ containedButton ]
                 [ onClick Pick ]
                 [ text "Subir Kardex" ]
             , text
