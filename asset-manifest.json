@@ -1,7 +1,7 @@
 {
-  "main.css": "/Kardex/static/css/main.8841eba0.chunk.css",
-  "main.js": "/Kardex/static/js/main.c29b473d.chunk.js",
-  "main.js.map": "/Kardex/static/js/main.c29b473d.chunk.js.map",
+  "main.css": "/Kardex/static/css/main.8065eaa1.chunk.css",
+  "main.js": "/Kardex/static/js/main.a3fc362d.chunk.js",
+  "main.js.map": "/Kardex/static/js/main.a3fc362d.chunk.js.map",
   "runtime~main.js": "/Kardex/static/js/runtime~main.5e3f2703.js",
   "runtime~main.js.map": "/Kardex/static/js/runtime~main.5e3f2703.js.map",
   "vendors~main.js": "/Kardex/static/js/vendors~main.b17b319b.chunk.js",
@@ -11,5 +11,5 @@
   "index.html": "/Kardex/index.html",
   "logo.svg": "/Kardex/logo.svg",
   "manifest.json": "/Kardex/manifest.json",
-  "precache-manifest.0afa5f0111827c11c1a939ef87e0aecf.js": "/Kardex/precache-manifest.0afa5f0111827c11c1a939ef87e0aecf.js"
+  "precache-manifest.2775a47bbda441952129b91a8b0d15fa.js": "/Kardex/precache-manifest.2775a47bbda441952129b91a8b0d15fa.js"
 }
