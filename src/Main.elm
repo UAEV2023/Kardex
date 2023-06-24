@@ -211,7 +211,6 @@ view model =
     styled div
         [ property "display" "grid"
         , property "grid-template-columns" "1fr"
-        , property "justify-items" "center"
         , property "grid-gap" "1rem"
         , padding2 (rem 2) (rem 4)
         ]
@@ -233,7 +232,6 @@ view model =
                     hex "#002E5F"
                 )
             , borderRadius (rem 1)
-            , width (pct 100)
             , padding (rem 2)
             , UI.Media.onPrint [ display none ]
             ]
@@ -287,9 +285,7 @@ view model =
                             |> List.concatMap .attempts
                             |> Kardex.groupAttemptsBySubject aliases Dict.empty
                 in
-                styled div
-                    [ property "justify-self" "stretch" ]
-                    []
+                div []
                     (List.concat
                         [ attemptsPerSubject
                             |> getCurriculumProgress curriculum
