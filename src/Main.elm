@@ -211,7 +211,6 @@ view model =
     styled div
         [ property "display" "grid"
         , property "grid-template-columns" "1fr"
-        , property "grid-gap" "1rem"
         , padding2 (rem 2) (rem 4)
         ]
         []
@@ -233,6 +232,7 @@ view model =
                 )
             , borderRadius (rem 1)
             , padding (rem 2)
+            , marginBottom (rem 1)
             , UI.Media.onPrint [ display none ]
             ]
             [ hijackOn "drop" (Decode.at [ "dataTransfer", "files" ] (Decode.oneOrMore GotFiles File.decoder))
@@ -277,6 +277,36 @@ view model =
                     )
                 ]
             ]
+        , case model.studentName of
+            Just studentName ->
+                styled p
+                    [ property "justify-self" "start"
+                    , marginTop (px 0)
+                    , marginBottom (rem 0.125)
+                    , letterSpacing (px 0.5)
+                    ]
+                    []
+                    [ text "Alumno: "
+                    , styled span
+                        [ fontWeight (int 500) ]
+                        []
+                        [ text studentName ]
+                    ]
+
+            Nothing ->
+                text ""
+        , case model.tutorName of
+            Just tutorName ->
+                styled p
+                    [ property "justify-self" "start"
+                    , marginTop (px 0)
+                    , letterSpacing (px 0.5)
+                    ]
+                    []
+                    [ text ("Tutor: " ++ tutorName) ]
+
+            Nothing ->
+                text ""
         , case ( model.periods, model.curriculum ) of
             ( Just periods, Just curriculum ) ->
                 let

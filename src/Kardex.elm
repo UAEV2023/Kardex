@@ -12,6 +12,7 @@ import Html.Parser
 import HtmlNodes
 import List.Extra
 import Maybe.Extra
+import String.Extra
 
 
 type alias Attempt =
@@ -55,11 +56,13 @@ fromHtmlDocument docResult =
             , studentName =
                 studentAndTutorNodes
                     |> List.Extra.getAt 0
-                    |> Maybe.map (HtmlNodes.firstText >> Maybe.withDefault "")
+                    |> Maybe.andThen HtmlNodes.firstText
+                    |> Maybe.map (String.dropLeft 25 >> String.toLower >> String.Extra.toTitleCase)
             , tutorName =
                 studentAndTutorNodes
                     |> List.Extra.getAt 1
-                    |> Maybe.map (HtmlNodes.firstText >> Maybe.withDefault "")
+                    |> Maybe.andThen HtmlNodes.firstText
+                    |> Maybe.map (String.dropLeft 7 >> String.toLower >> String.Extra.toTitleCase)
             }
 
         Err _ ->
