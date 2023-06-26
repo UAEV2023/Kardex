@@ -207,7 +207,6 @@ view model =
             Just studentName ->
                 styled p
                     [ property "justify-self" "start"
-                    , UI.Styles.body1
                     , marginBottom (rem 0.125)
                     ]
                     []
@@ -223,9 +222,7 @@ view model =
         , case model.tutorName of
             Just tutorName ->
                 styled p
-                    [ property "justify-self" "start"
-                    , UI.Styles.body1
-                    ]
+                    [ property "justify-self" "start" ]
                     []
                     [ text ("Tutor: " ++ tutorName) ]
 
