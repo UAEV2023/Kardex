@@ -81,7 +81,8 @@ update msg model =
                 , hover = False
               }
             , Task.perform GotKardex
-                (File.toString file
+                (file
+                    |> File.toString
                     |> Task.map Html.Parser.runDocument
                     |> Task.map Kardex.fromHtmlDocument
                 )
