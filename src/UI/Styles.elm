@@ -1,6 +1,7 @@
 module UI.Styles exposing
     ( body1
     , containedButton
+    , headline4
     , semesterProgressRow
     )
 
@@ -86,9 +87,26 @@ containedButton =
 body1 : Style
 body1 =
     batch
-        [ marginTop (px 0)
-        , letterSpacing (px 0.5)
+        [ letterSpacing (px 0.5)
         , fontSize (em 1)
+        ]
+
+
+headline4 : Style
+headline4 =
+    batch
+        [ fontSize (em 2.125)
+        , letterSpacing (px 0.25)
+        , fontWeight (int 400)
+        ]
+
+
+headline5 : Style
+headline5 =
+    batch
+        [ fontSize (em 1.5)
+        , letterSpacing (px 0)
+        , fontWeight (int 400)
         ]
 
 

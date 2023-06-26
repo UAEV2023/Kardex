@@ -244,7 +244,7 @@ view model =
                         , [ styled div
                                 [ marginBottom (rem 2) ]
                                 []
-                                [ h2 [] [ text "Otros" ]
+                                [ styled h2 [ UI.Styles.headline4 ] [] [ text "Otros" ]
                                 , p [] [ text "Si una materia se encuentra aquí es porque la malla curricular está incompleta o tiene errores de ortografía. Favor de reportarlo al desarrollador" ]
                                 , styled div
                                     [ UI.Styles.semesterProgressRow ]
@@ -268,7 +268,7 @@ showSemesterProgress { semesterName, semesterProgress } =
     styled div
         [ marginBottom (rem 2) ]
         []
-        [ h2 [] [ text semesterName ]
+        [ styled h2 [ UI.Styles.headline4 ] [] [ text semesterName ]
         , styled div
             [ UI.Styles.semesterProgressRow ]
             []
