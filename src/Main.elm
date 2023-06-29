@@ -278,6 +278,10 @@ showSemesterProgress { semesterName, semesterProgress } =
 
 showSubjectProgress : ( String, List Kardex.Attempt ) -> Html msg
 showSubjectProgress ( nombre, attempts ) =
+    let
+        numberOfAttempts =
+            List.length attempts
+    in
     styled div
         [ property "display" "grid"
         , border3 (px 1) solid (rgb 11 14 17)
@@ -292,37 +296,29 @@ showSubjectProgress ( nombre, attempts ) =
             ]
             []
             [ text nombre ]
-        , if List.length attempts > 0 then
+        , if numberOfAttempts > 0 then
             styled div
                 [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8)
                 , paddingBottom (rem 0.4)
                 , marginBottom (rem 0.4)
                 ]
                 []
-                [ (attempts
-                    |> List.length
-                    |> String.fromInt
-                  )
-                    ++ (attempts
-                            |> List.length
-                            |> foo " intento"
-                       )
-                    |> text
+                [ text <|
+                    String.concat
+                        [ String.fromInt numberOfAttempts
+                        , " "
+                        , if numberOfAttempts == 1 then
+                            "intento"
+
+                          else
+                            "intentos"
+                        ]
                 ]
 
           else
             text ""
         , showLastSituation attempts
         ]
-
-
-foo : String -> Int -> String
-foo word n =
-    if n == 1 then
-        word
-
-    else
-        word ++ "s"
 
 
 showLastSituation : List Kardex.Attempt -> Html msg
