@@ -316,7 +316,7 @@ showSubjectProgress ( nombre, attempts ) =
                 ]
 
           else
-            text ""
+            text "Sin intentos"
         , showLastSituation attempts
         ]
 
@@ -335,7 +335,7 @@ showLastSituation attempts =
             styled div
                 [ backgroundColor (rgba 64 64 64 0.4) ]
                 []
-                [ text "Sin Intentos" ]
+                [ text "No calificada" ]
 
 
 getSituationColor : String -> List a -> Color
