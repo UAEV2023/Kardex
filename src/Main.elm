@@ -341,29 +341,41 @@ showLastSituation attempts =
     case List.Extra.last attempts of
         Just { situation } ->
             styled div
-                [ backgroundColor (getSituationColor situation attempts)
+                [ getSituationBackgroundColor situation
                 ]
                 []
                 [ text situation ]
 
         Nothing ->
-            styled div
-                [ backgroundColor (rgba 64 64 64 0.4) ]
-                []
-                [ text "No calificada" ]
+            text "No calificada"
 
 
-getSituationColor : String -> List a -> Color
-getSituationColor situation attempts =
-    case ( situation, List.length attempts ) of
-        ( "No Acreditado", 1 ) ->
-            rgba 231 143 12 0.6
+passedSituations : List String
+passedSituations =
+    [ "APROBADO"
+    , "Suficiente"
+    , "Satisfactorio"
+    , "Sobresaliente"
+    ]
 
-        ( "No Acreditado", _ ) ->
-            rgba 231 12 12 0.6
 
-        _ ->
-            rgb 255 255 255
+failedSituations : List String
+failedSituations =
+    [ "REPROBADO"
+    , "No Acreditado"
+    ]
+
+
+getSituationBackgroundColor : String -> Style
+getSituationBackgroundColor situation =
+    if List.member situation passedSituations then
+        backgroundColor (hex "#81c784cc")
+
+    else if List.member situation failedSituations then
+        backgroundColor (hex "#e57373cc")
+
+    else
+        backgroundColor transparent
 
 
 type alias Curriculum =
