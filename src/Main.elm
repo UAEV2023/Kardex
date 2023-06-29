@@ -299,7 +299,7 @@ showSubjectProgress ( nombre, attempts ) =
         , divider
         , if numberOfAttempts > 0 then
             styled div
-                []
+                [ getAttemptBackgroundColor numberOfAttempts ]
                 []
                 [ text <|
                     String.concat
@@ -318,6 +318,22 @@ showSubjectProgress ( nombre, attempts ) =
         , divider
         , showLastSituation attempts
         ]
+
+
+getAttemptBackgroundColor : Int -> Style
+getAttemptBackgroundColor numberOfAttempts =
+    case numberOfAttempts of
+        2 ->
+            backgroundColor (hex "#4fc3f7cc")
+
+        3 ->
+            backgroundColor (hex "#ffb74dcc")
+
+        4 ->
+            backgroundColor (hex "#e57373cc")
+
+        _ ->
+            backgroundColor transparent
 
 
 showLastSituation : List Kardex.Attempt -> Html msg
