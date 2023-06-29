@@ -276,6 +276,11 @@ showSemesterProgress { semesterName, semesterProgress } =
         ]
 
 
+divider : Html msg
+divider =
+    styled span [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8) ] [] []
+
+
 showSubjectProgress : ( String, List Kardex.Attempt ) -> Html msg
 showSubjectProgress ( nombre, attempts ) =
     let
@@ -284,24 +289,17 @@ showSubjectProgress ( nombre, attempts ) =
     in
     styled div
         [ property "display" "grid"
+        , property "gap" "0.4rem"
         , border3 (px 1) solid (rgb 11 14 17)
         , borderRadius (px 5)
         , padding (rem 0.5)
         ]
         []
-        [ styled div
-            [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8)
-            , paddingBottom (rem 0.4)
-            , marginBottom (rem 0.4)
-            ]
-            []
-            [ text nombre ]
+        [ div [] [ text nombre ]
+        , divider
         , if numberOfAttempts > 0 then
             styled div
-                [ borderBottom3 (px 1) solid (rgba 56 56 61 0.8)
-                , paddingBottom (rem 0.4)
-                , marginBottom (rem 0.4)
-                ]
+                []
                 []
                 [ text <|
                     String.concat
@@ -317,6 +315,7 @@ showSubjectProgress ( nombre, attempts ) =
 
           else
             text "Sin intentos"
+        , divider
         , showLastSituation attempts
         ]
 
