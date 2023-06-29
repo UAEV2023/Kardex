@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/Kardex/precache-manifest.2775a47bbda441952129b91a8b0d15fa.js"
+  "/Kardex/precache-manifest.a6766abfd678d3a73d09fa5adccd2728.js"
 );
 
 workbox.core.skipWaiting();
