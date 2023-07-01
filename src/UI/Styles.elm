@@ -57,6 +57,9 @@ baseButton =
         , fontFamilies [ "Roboto", "sans-serif" ]
         , textTransform uppercase
         , cursor pointer
+        , borderRadius (px 4)
+        , outline none
+        , property "transition-duration" "0.28s"
         ]
 
 
@@ -70,10 +73,7 @@ containedButton =
         , paddingRight (rem 1)
         , height (rem 2.25)
         , minWidth (rem 4)
-        , borderRadius (px 4)
         , border (px 0)
-        , outline none
-        , property "transition-duration" "0.28s"
         , property "box-shadow" "0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)"
         , hover [ property "box-shadow" "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)" ]
         , focus [ property "box-shadow" "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)" ]
