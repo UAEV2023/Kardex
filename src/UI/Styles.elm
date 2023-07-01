@@ -2,6 +2,7 @@ module UI.Styles exposing
     ( body1
     , containedButton
     , headline4
+    , outlinedButtonWithIcon
     , semesterProgressRow
     )
 
@@ -37,6 +38,17 @@ overlayOnColoredSurface =
         , hover [ opacity (num 0.08) ]
         , focus [ opacity (num 0.24) ]
         , active [ opacity (num 0.32) ]
+        ]
+
+
+overlayOnWhiteBackground : Style
+overlayOnWhiteBackground =
+    batch
+        [ baseOverlay
+        , opacity (num 0)
+        , hover [ opacity (num 0.04) ]
+        , focus [ opacity (num 0.08) ]
+        , active [ opacity (num 0.12) ]
         ]
 
 
@@ -80,6 +92,28 @@ containedButton =
         , after
             [ property "content" "\"\""
             , overlayOnColoredSurface
+            ]
+        ]
+
+
+outlinedButtonWithIcon : Style
+outlinedButtonWithIcon =
+    batch
+        [ baseButton
+        , backgroundColor transparent
+        , color (hex "#002E5F")
+        , border3 (px 1) solid (rgba 0 0 0 0.12)
+        , paddingLeft (rem 0.75)
+        , paddingRight (rem 1)
+        , height (rem 2.25)
+        , minWidth (rem 4)
+        , property "display" "grid"
+        , property "place-items" "center"
+        , property "grid-template-columns" "auto auto"
+        , property "grid-gap" "0.5rem"
+        , after
+            [ property "content" "\"\""
+            , overlayOnWhiteBackground
             ]
         ]
 

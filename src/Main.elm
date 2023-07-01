@@ -12,7 +12,10 @@ import Html.Styled.Events exposing (..)
 import Json.Decode as Decode
 import Kardex exposing (Kardex)
 import List.Extra
+import Material.Icons as Filled
+import Material.Icons.Types exposing (Coloring(..))
 import Set
+import Svg.Styled
 import Task
 import UI.Media
 import UI.Styles
@@ -238,7 +241,16 @@ view model =
                 in
                 div []
                     (List.concat
-                        [ attemptsPerSubject
+                        [ [ styled button
+                                [ UI.Styles.outlinedButtonWithIcon
+                                , UI.Media.onPrint [ display none ]
+                                ]
+                                []
+                                [ Svg.Styled.fromUnstyled (Filled.print 18 Inherit)
+                                , text "Imprimir"
+                                ]
+                          ]
+                        , attemptsPerSubject
                             |> getCurriculumProgress curriculum
                             |> List.map showSemesterProgress
                         , [ styled div
