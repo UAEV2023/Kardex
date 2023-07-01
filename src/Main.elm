@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Css exposing (..)
@@ -49,11 +49,19 @@ init =
 
 
 
+---- PORTS ----
+
+
+port printPage : () -> Cmd msg
+
+
+
 ---- UPDATE ----
 
 
 type Msg
     = Pick
+    | Print
     | DragEnter
     | DragLeave
     | GotFiles File (List File)
@@ -67,6 +75,11 @@ update msg model =
         Pick ->
             ( model
             , Select.files [ ".html" ] GotFiles
+            )
+
+        Print ->
+            ( model
+            , printPage ()
             )
 
         DragEnter ->
@@ -245,7 +258,7 @@ view model =
                                 [ UI.Styles.outlinedButtonWithIcon
                                 , UI.Media.onPrint [ display none ]
                                 ]
-                                []
+                                [ onClick Print ]
                                 [ Svg.Styled.fromUnstyled (Filled.print 18 Inherit)
                                 , text "Imprimir"
                                 ]
