@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Kardex/favicon.ico"
   },
   {
-    "revision": "0f82510caf5ff69af23c947028314f7a",
+    "revision": "a05b415e96aa6db1583c3a3c80bfaa23",
     "url": "/Kardex/index.html"
   },
   {
@@ -16,12 +16,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Kardex/manifest.json"
   },
   {
-    "revision": "f8db3ab8f23395bf8baf",
+    "revision": "76acb3a52bfa122aa4f9",
     "url": "/Kardex/static/css/main.f58385b9.chunk.css"
   },
   {
-    "revision": "f8db3ab8f23395bf8baf",
-    "url": "/Kardex/static/js/main.f8db3ab8.chunk.js"
+    "revision": "76acb3a52bfa122aa4f9",
+    "url": "/Kardex/static/js/main.76acb3a5.chunk.js"
   },
   {
     "revision": "5e3f2703957ab70aa55e",
