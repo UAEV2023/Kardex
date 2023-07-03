@@ -377,7 +377,7 @@ showLastSituation attempts =
 
 passedSituations : List String
 passedSituations =
-    [ "APROBADO"
+    [ "APROBADA"
     , "Suficiente"
     , "Satisfactorio"
     , "Sobresaliente"
@@ -386,7 +386,7 @@ passedSituations =
 
 failedSituations : List String
 failedSituations =
-    [ "REPROBADO"
+    [ "REPROBADA"
     , "No Acreditado"
     ]
 
